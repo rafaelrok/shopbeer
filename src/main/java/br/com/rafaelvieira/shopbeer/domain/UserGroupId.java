@@ -15,7 +15,7 @@ public class UserGroupId implements Serializable {
 
 	@ManyToOne
 	@JoinColumn(name = "code_user")
-	private User user;
+	private UserEmployee userEmployee;
 	
 	@ManyToOne
 	@JoinColumn(name = "code_group")
@@ -27,7 +27,7 @@ public class UserGroupId implements Serializable {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((group == null) ? 0 : group.hashCode());
-		result = prime * result + ((user == null) ? 0 : user.hashCode());
+		result = prime * result + ((userEmployee == null) ? 0 : userEmployee.hashCode());
 		return result;
 	}
 
@@ -45,10 +45,10 @@ public class UserGroupId implements Serializable {
 				return false;
 		} else if (!group.equals(other.group))
 			return false;
-		if (user == null) {
-			if (other.user != null)
+		if (userEmployee == null) {
+			if (other.userEmployee != null)
 				return false;
-		} else if (!user.equals(other.user))
+		} else if (!userEmployee.equals(other.userEmployee))
 			return false;
 		return true;
 	}

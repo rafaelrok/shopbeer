@@ -49,7 +49,7 @@ public class Sale {
 
 	@ManyToOne
 	@JoinColumn(name = "code_user")
-	private User user;
+	private UserEmployee userEmployee;
 
 	@Enumerated(EnumType.STRING)
 	private StatusSale status = StatusSale.BUDGET;
