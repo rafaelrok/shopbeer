@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.List;
 
@@ -13,9 +14,10 @@ import java.util.List;
 @ToString
 @RequiredArgsConstructor
 @Entity
-@Table(name = "estilo")
+@Table(name = "style")
 public class Style implements Serializable {
 
+	@Serial
 	private static final long serialVersionUID = 1L;
 
 	@Id

@@ -1,5 +1,6 @@
 package br.com.rafaelvieira.shopbeer.domain;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 import jakarta.persistence.Embeddable;
@@ -12,6 +13,7 @@ import lombok.Data;
 @Embeddable
 public class Address implements Serializable {
 
+	@Serial
 	private static final long serialVersionUID = 1L;
 
 	private String street;

@@ -3,6 +3,7 @@ package br.com.rafaelvieira.shopbeer.domain;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 @Getter
@@ -13,6 +14,7 @@ import java.io.Serializable;
 @Table(name = "permission")
 public class Permission implements Serializable {
 
+	@Serial
 	private static final long serialVersionUID = 1L;
 
 	@Id

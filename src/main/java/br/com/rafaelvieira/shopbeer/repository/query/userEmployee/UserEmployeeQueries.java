@@ -1,4 +1,4 @@
-package br.com.rafaelvieira.shopbeer.repository.helper.userEmployee;
+package br.com.rafaelvieira.shopbeer.repository.query.userEmployee;
 
 import java.util.List;
 import java.util.Optional;

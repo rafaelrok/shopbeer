@@ -8,6 +8,7 @@ import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.List;
@@ -20,10 +21,11 @@ import java.util.List;
 @AttributeConfirmation(attribute = "password", attributeConfirmation = "confirmPassword"
 				, message = "Password confirmation does not match")
 @Entity
-@Table(name = "user")
+@Table(name = "user_employee")
 @DynamicUpdate
 public class UserEmployee implements Serializable {
 
+	@Serial
 	private static final long serialVersionUID = 1L;
 
 	@Id
@@ -47,7 +49,7 @@ public class UserEmployee implements Serializable {
 
 	@Size(min = 1, message = "Select at least one group")
 	@ManyToMany
-	@JoinTable(name = "user_group", joinColumns = @JoinColumn(name = "code_user")
+	@JoinTable(name = "user_employee_group", joinColumns = @JoinColumn(name = "code_user_employee")
 				, inverseJoinColumns = @JoinColumn(name = "code_group"))
 	@ToString.Exclude
 	private List<Group> groups;

@@ -1,4 +1,4 @@
-package br.com.rafaelvieira.shopbeer.repository.helper.userEmployee;
+package br.com.rafaelvieira.shopbeer.repository.query.userEmployee;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -7,7 +7,6 @@ import java.util.Optional;
 import br.com.rafaelvieira.shopbeer.domain.Group;
 import br.com.rafaelvieira.shopbeer.domain.UserGroup;
 import br.com.rafaelvieira.shopbeer.repository.filter.UserEmployeeFilter;
-import br.com.rafaelvieira.shopbeer.repository.pagination.PaginationUtil;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.criteria.*;

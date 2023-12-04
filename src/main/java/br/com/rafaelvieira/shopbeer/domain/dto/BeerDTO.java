@@ -24,7 +24,7 @@ public class BeerDTO {
 		this.name = name;
 		this.origin = origin.getDescription();
 		this.value = value;
-		this.photo = StringUtils.isEmpty(photo) ? "cerveja-mock.png" : photo;
+		this.photo = StringUtils.isEmpty(photo) ? "beer-mock.png" : photo;
 	}
 
 }

@@ -48,7 +48,7 @@ public class Sale {
 	private Costumer costumer;
 
 	@ManyToOne
-	@JoinColumn(name = "code_user")
+	@JoinColumn(name = "code_user_employee")
 	private UserEmployee userEmployee;
 
 	@Enumerated(EnumType.STRING)

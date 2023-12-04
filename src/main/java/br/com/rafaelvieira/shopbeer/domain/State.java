@@ -3,6 +3,7 @@ package br.com.rafaelvieira.shopbeer.domain;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 @Getter
@@ -10,9 +11,10 @@ import java.io.Serializable;
 @ToString
 @RequiredArgsConstructor
 @Entity
-@Table(name = "estado")
+@Table(name = "state")
 public class State implements Serializable {
 
+	@Serial
 	private static final long serialVersionUID = 1L;
 
 	private Long code;

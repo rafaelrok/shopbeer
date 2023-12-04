@@ -1,7 +1,7 @@
 package br.com.rafaelvieira.shopbeer.repository;
 
 import br.com.rafaelvieira.shopbeer.domain.UserEmployee;
-import br.com.rafaelvieira.shopbeer.repository.helper.userEmployee.UserEmployeeQueries;
+import br.com.rafaelvieira.shopbeer.repository.query.userEmployee.UserEmployeeQueries;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

@@ -3,17 +3,15 @@ package br.com.rafaelvieira.shopbeer.domain;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
+import lombok.Getter;
 
+@Getter
 @Entity
 @Table(name = "user_group")
 public class UserGroup {
 
 	@EmbeddedId
 	private UserGroupId id;
-
-	public UserGroupId getId() {
-		return id;
-	}
 
 	public void setId(UserGroupId id) {
 		this.id = id;

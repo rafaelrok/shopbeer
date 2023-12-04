@@ -1,5 +1,6 @@
 package br.com.rafaelvieira.shopbeer.domain;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 import jakarta.persistence.Embeddable;
@@ -11,10 +12,11 @@ import lombok.Data;
 @Embeddable
 public class UserGroupId implements Serializable {
 
+	@Serial
 	private static final long serialVersionUID = 1L;
 
 	@ManyToOne
-	@JoinColumn(name = "code_user")
+	@JoinColumn(name = "code_user_employee")
 	private UserEmployee userEmployee;
 	
 	@ManyToOne

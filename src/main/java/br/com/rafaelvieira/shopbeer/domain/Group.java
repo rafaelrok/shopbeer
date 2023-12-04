@@ -3,6 +3,7 @@ package br.com.rafaelvieira.shopbeer.domain;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.List;
 
@@ -15,6 +16,7 @@ import java.util.List;
 @Table(name = "group")
 public class Group implements Serializable {
 
+	@Serial
 	private static final long serialVersionUID = 1L;
 
 	@Id
@@ -24,9 +26,9 @@ public class Group implements Serializable {
 	private String name;
 
 	@ManyToMany
-	@JoinTable(name = "grupo_permissao",
+	@JoinTable(name = "group_permission",
 			joinColumns = @JoinColumn(name = "code_group"),
-			inverseJoinColumns = @JoinColumn(name = "codigo_permissao"))
+			inverseJoinColumns = @JoinColumn(name = "code_permission"))
 	@ToString.Exclude
 	private List<Permission> permissions;
 

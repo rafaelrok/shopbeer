@@ -36,7 +36,7 @@ public class Costumer implements Serializable {
 
 	@NotNull(message = "Type person is required")
 	@Enumerated(EnumType.STRING)
-	@Column(name = "tipo_pessoa")
+	@Column(name = "type_person")
 	private TypePerson typePerson;
 
 	@NotBlank(message = "CPF/CNPJ is required")
