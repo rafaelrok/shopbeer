@@ -57,7 +57,7 @@ public class Beer implements Serializable {
 	@NotNull(message = "Quantity in stock is mandatory")
 	@Max(value = 9999, message = "The quantity in stock must be less than 9.999")
 	@Column(name = "quantity_stock")
-	private Integer QuantityStock;
+	private Integer quantityStock;
 
 	@NotNull(message = "Origin is mandatory")
 	@Enumerated(EnumType.STRING)

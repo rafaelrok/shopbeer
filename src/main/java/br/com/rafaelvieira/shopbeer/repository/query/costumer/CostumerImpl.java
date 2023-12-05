@@ -73,36 +73,4 @@ public class CostumerImpl implements CostumerQueries {
 			}
 		}
 	}
-
-
-//	public Page<Costumer> filter(CostumerFilter costumerFilter, Pageable pageable) {
-//		Criteria criteria = manager.unwrap(Session.class).createCriteria(Costumer.class);
-//
-//		paginacaoUtil.preparar(criteria, pageable);
-//		addFilter(costumerFilter, criteria);
-//		criteria.createAlias("address.city", "c", JoinType.LEFT_OUTER_JOIN);
-//		criteria.createAlias("c.state", "e", JoinType.LEFT_OUTER_JOIN);
-//
-//		return new PageImpl<>(criteria.list(), pageable, total(filtro));
-//	}
-//
-//	private Long total(CostumerFilter filtro) {
-//		Criteria criteria = manager.unwrap(Session.class).createCriteria(Costumer.class);
-//		addFilter(filtro, criteria);
-//		criteria.setProjection(Projections.rowCount());
-//		return (Long) criteria.uniqueResult();
-//	}
-//
-//	private void addFilter(CostumerFilter costumerFilter, Criteria criteria) {
-//		if (costumerFilter != null) {
-//			if (!StringUtils.hasText(costumerFilter.getName())) {
-//				criteria.add(Restrictions.ilike("name", costumerFilter.getName(), MatchMode.ANYWHERE));
-//			}
-//
-//			if (!StringUtils.hasText(filtro.getCpfOuCnpj())) {
-//				criteria.add(Restrictions.eq("cpfOrCnpj", costumerFilter.getCpfOuCnpjSemFormatacao()));
-//			}
-//		}
-//	}
-
 }

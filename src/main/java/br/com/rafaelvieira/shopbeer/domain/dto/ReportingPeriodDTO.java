@@ -5,7 +5,7 @@ import lombok.Data;
 import java.time.LocalDate;
 
 @Data
-public class ReportingPeriod {
+public class ReportingPeriodDTO {
 
 	private LocalDate startDate;
 	private LocalDate endDate;

@@ -2,31 +2,25 @@ package br.com.rafaelvieira.shopbeer.domain.dto;
 
 import lombok.Data;
 
-import java.math.BigDecimal;
-
 @Data
 public class StockItemValue {
 
-	private BigDecimal value;
+	private Long value;
 	private Long totalItens;
 	
 	public StockItemValue() {
-		
 	}
 
-	public StockItemValue(BigDecimal value, Long totalItens) {
+	public StockItemValue(Long value, Long totalItens) {
 		this.value = value;
 		this.totalItens = totalItens;
 	}
 
-	public BigDecimal getValor() {
-		return value != null ? value : BigDecimal.ZERO;
+	public Long getValue() {
+		return value != null ? value : 0L;
 	}
 
 	public Long getTotalItens() {
 		return totalItens != null ? totalItens : 0L;
 	}
-
-
-	
 }

@@ -21,7 +21,7 @@ import br.com.rafaelvieira.shopbeer.domain.UserEmployee;
 import org.springframework.util.StringUtils;
 
 
-public class UserEmployeeImpl implements UserEmployeeQueries {
+public class UserEmployeeImpl implements UserEmployeesQuery {
 
 	@PersistenceContext
 	private EntityManager manager;
@@ -61,7 +61,7 @@ public class UserEmployeeImpl implements UserEmployeeQueries {
 		// Adicione os filtros aqui, por exemplo:
 		List<Predicate> predicates = new ArrayList<>();
 		if (filter != null) {
-			if (!StringUtils.isEmpty(filter.getName())) {
+			if (!StringUtils.hasText(filter.getName())) {
 				predicates.add(cb.like(root.get("nome"), "%" + filter.getName() + "%"));
 			}
 			// Adicione mais filtros conforme necessário...

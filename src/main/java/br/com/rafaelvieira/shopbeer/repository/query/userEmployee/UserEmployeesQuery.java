@@ -8,7 +8,7 @@ import br.com.rafaelvieira.shopbeer.repository.filter.UserEmployeeFilter;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-public interface UserEmployeeQueries {
+public interface UserEmployeesQuery {
 
 	public Optional<UserEmployee> perEmailActive(String email);
 	
