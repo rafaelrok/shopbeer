@@ -20,6 +20,20 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @Entity
 @Table(name = "sale")
+@NamedQueries({
+		@NamedQuery(name = "sale.totalByMonth",
+				query = "SELECT new br.com.rafaelvieira.shopbeer.domain.dto.SalesMonthDTO( "
+						+ "FUNCTION('MONTH', s.createDate), "
+						+ "SUM(s.amount)) "
+						+ "FROM Sale s "
+						+ "GROUP BY FUNCTION('MONTH', s.createDate)"),
+		@NamedQuery(name = "sale.byOrigin",
+				query = "SELECT new br.com.rafaelvieira.shopbeer.domain.dto.OriginSalesDTO( "
+						+ "FUNCTION('MONTH', s.createDate), "
+						+ "COUNT(s)) "
+						+ "FROM Sale s "
+						+ "GROUP BY FUNCTION('MONTH', s.createDate)")
+})
 @DynamicUpdate
 public class Sale {
 

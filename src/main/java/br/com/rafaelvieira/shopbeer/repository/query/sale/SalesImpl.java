@@ -96,7 +96,7 @@ public class SalesImpl implements SalesQuery {
 	@SuppressWarnings("unchecked")
 	@Override
 	public List<SalesMonthDTO> totalByMonth() {
-		List<SalesMonthDTO> salesMonth = manager.createNamedQuery("Sale.totalByMonth").getResultList();
+		List<SalesMonthDTO> salesMonth = manager.createNamedQuery("sale.totalByMonth").getResultList();
 		
 		LocalDate today = LocalDate.now();
 		for (int i = 1; i <= 6; i++) {
@@ -115,7 +115,7 @@ public class SalesImpl implements SalesQuery {
 	
 	@Override
 	public List<OriginSalesDTO> totalByOrigin() {
-		List<OriginSalesDTO> salesNationality = manager.createNamedQuery("Sale.byOrigin", OriginSalesDTO.class).getResultList();
+		List<OriginSalesDTO> salesNationality = manager.createNamedQuery("sale.byOrigin", OriginSalesDTO.class).getResultList();
 		
 		LocalDate now = LocalDate.now();
 		for (int i = 1; i <= 6; i++) {
