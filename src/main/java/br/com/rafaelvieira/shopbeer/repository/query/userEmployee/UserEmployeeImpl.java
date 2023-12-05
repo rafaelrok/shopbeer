@@ -7,6 +7,7 @@ import java.util.Optional;
 import br.com.rafaelvieira.shopbeer.domain.Group;
 import br.com.rafaelvieira.shopbeer.domain.UserGroup;
 import br.com.rafaelvieira.shopbeer.repository.filter.UserEmployeeFilter;
+import br.com.rafaelvieira.shopbeer.repository.pagination.PaginationUtil;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.criteria.*;
@@ -29,11 +30,11 @@ public class UserEmployeeImpl implements UserEmployeesQuery {
 	/*
 	 * Codigo antigo com Criteria do Hibernate (deprecated)
 	 */
-//	private final PaginationUtil paginationUtil;
-//
-//	public UserEmployeeImpl(PaginationUtil paginationUtil) {
-//		this.paginationUtil = paginationUtil;
-//	}
+	private final PaginationUtil paginationUtil;
+
+	public UserEmployeeImpl(PaginationUtil paginationUtil) {
+		this.paginationUtil = paginationUtil;
+	}
 
 	@Override
 	public Optional<UserEmployee> perEmailActive(String email) {
@@ -58,26 +59,18 @@ public class UserEmployeeImpl implements UserEmployeesQuery {
 		CriteriaQuery<UserEmployee> cq = cb.createQuery(UserEmployee.class);
 		Root<UserEmployee> root = cq.from(UserEmployee.class);
 
-		// Adicione os filtros aqui, por exemplo:
-		List<Predicate> predicates = new ArrayList<>();
-		if (filter != null) {
-			if (!StringUtils.hasText(filter.getName())) {
-				predicates.add(cb.like(root.get("nome"), "%" + filter.getName() + "%"));
-			}
-			// Adicione mais filtros conforme necessário...
-		}
-		cq.where(predicates.toArray(new Predicate[0]));
-
+		addFilter(filter, cb, cq, root);
+		paginationUtil.prepare(cb, pageable);
 		// Adicione a ordenação aqui, por exemplo:
-		if (pageable.getSort() != null && pageable.getSort().isSorted()) {
-			pageable.getSort().forEach(order -> {
-				if (order.isAscending()) {
-					cq.orderBy(cb.asc(root.get(order.getProperty())));
-				} else {
-					cq.orderBy(cb.desc(root.get(order.getProperty())));
-				}
-			});
-		}
+//		if (pageable.getSort() != null && pageable.getSort().isSorted()) {
+//			pageable.getSort().forEach(order -> {
+//				if (order.isAscending()) {
+//					cq.orderBy(cb.asc(root.get(order.getProperty())));
+//				} else {
+//					cq.orderBy(cb.desc(root.get(order.getProperty())));
+//				}
+//			});
+//		}
 
 		// Execute a consulta e obtenha o resultado
 		int totalRows = manager.createQuery(cq).getResultList().size();
@@ -109,12 +102,12 @@ public class UserEmployeeImpl implements UserEmployeesQuery {
 
 	@Transactional(readOnly = true)
 	@Override
-	public UserEmployee searchWithGroups(Long codigo) {
+	public UserEmployee searchWithGroups(Long code) {
 		CriteriaBuilder cb = manager.getCriteriaBuilder();
 		CriteriaQuery<UserEmployee> cq = cb.createQuery(UserEmployee.class);
 		Root<UserEmployee> root = cq.from(UserEmployee.class);
 
-		cq.where(cb.equal(root.get("codigo"), codigo));
+		cq.where(cb.equal(root.get("code"), code));
 
 		return manager.createQuery(cq).getSingleResult();
 	}
@@ -132,20 +125,13 @@ public class UserEmployeeImpl implements UserEmployeesQuery {
 //		return (UserEmployee) criteria.uniqueResult();
 //	}
 
-	private Long total(UserEmployeeFilter filtro) {
+	private Long total(UserEmployeeFilter filter) {
 		CriteriaBuilder cb = manager.getCriteriaBuilder();
 		CriteriaQuery<Long> cq = cb.createQuery(Long.class);
 		Root<UserEmployee> root = cq.from(UserEmployee.class);
 
 		// Adicione os filtros aqui, por exemplo:
-		List<Predicate> predicates = new ArrayList<>();
-		if (filtro != null) {
-			if (!StringUtils.isEmpty(filtro.getName())) {
-				predicates.add(cb.like(root.get("nome"), "%" + filtro.getName() + "%"));
-			}
-			// Adicione mais filtros conforme necessário...
-		}
-		cq.where(predicates.toArray(new Predicate[0]));
+		addFilter(filter, cb, null, root);
 
 		cq.select(cb.count(root));
 
@@ -162,24 +148,24 @@ public class UserEmployeeImpl implements UserEmployeesQuery {
 //		return (Long) criteria.uniqueResult();
 //	}
 
-	private void addFilter(UserEmployeeFilter filtro, CriteriaBuilder cb, CriteriaQuery<UserEmployee> cq, Root<UserEmployee> root) {
+	private void addFilter(UserEmployeeFilter filter, CriteriaBuilder cb, CriteriaQuery<UserEmployee> cq, Root<UserEmployee> root) {
 		List<Predicate> predicates = new ArrayList<>();
-		if (filtro != null) {
-			if (!StringUtils.isEmpty(filtro.getName())) {
-				predicates.add(cb.like(root.get("nome"), "%" + filtro.getName() + "%"));
+		if (filter != null) {
+			if (!StringUtils.hasText(filter.getName())) {
+				predicates.add(cb.like(root.get("name"), "%" + filter.getName() + "%"));
 			}
 
-			if (!StringUtils.isEmpty(filtro.getEmail())) {
-				predicates.add(cb.like(root.get("email"), filtro.getEmail() + "%"));
+			if (!StringUtils.hasText(filter.getEmail())) {
+				predicates.add(cb.like(root.get("email"), filter.getEmail() + "%"));
 			}
 
-			if (filtro.getGroups() != null && !filtro.getGroups().isEmpty()) {
-				for (Long codigoGrupo : filtro.getGroups().stream().mapToLong(Group::getCode).toArray()) {
+			if (filter.getGroups() != null && !filter.getGroups().isEmpty()) {
+				for (Long codigoGrupo : filter.getGroups().stream().mapToLong(Group::getCode).toArray()) {
 					Subquery<Long> subquery = cq.subquery(Long.class);
 					Root<UserGroup> subRoot = subquery.from(UserGroup.class);
 					subquery.select(subRoot.get("id").get("userEmployee"));
-					subquery.where(cb.equal(subRoot.get("id").get("grupo").get("codigo"), codigoGrupo));
-					predicates.add(cb.in(root.get("codigo")).value(subquery));
+					subquery.where(cb.equal(subRoot.get("id").get("group").get("code"), codigoGrupo));
+					predicates.add(cb.in(root.get("code")).value(subquery));
 				}
 			}
 		}
