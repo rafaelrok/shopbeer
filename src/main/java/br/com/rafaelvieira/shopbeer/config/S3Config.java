@@ -14,9 +14,11 @@ import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
 
+import java.util.Objects;
+
 @Profile("prod")
 @Configuration
-@PropertySource(value = { "file://${HOME}/.brewer-s3.properties" }, ignoreResourceNotFound = true)
+@PropertySource(value = { "file://${HOME}/.shopbeer-s3.properties" }, ignoreResourceNotFound = true)
 public class S3Config {
 
 	private final Environment env;
@@ -28,7 +30,7 @@ public class S3Config {
 	@Bean
 	public AmazonS3 amazonS3() {
 		AWSCredentials credenciais = new BasicAWSCredentials(
-				env.getProperty("AWS_ACCESS_KEY_ID"), env.getProperty("AWS_SECRET_ACCESS_KEY"));
+				Objects.requireNonNull(env.getProperty("AWS_ACCESS_KEY_ID")), Objects.requireNonNull(env.getProperty("AWS_SECRET_ACCESS_KEY")));
 		AmazonS3 amazonS3 = new AmazonS3Client(credenciais, new ClientConfiguration());
 		Region regiao = Region.getRegion(Regions.US_WEST_2);
 		amazonS3.setRegion(regiao);
