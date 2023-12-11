@@ -18,8 +18,8 @@ public class CityService {
 
     @Transactional
     public void save(City city) {
-        Optional<City> cidadeExistente = cityRepository.findByNameAndState(city.getName(), city.getState());
-        if (cidadeExistente.isPresent()) {
+        Optional<City> existingCity = cityRepository.findByNameAndState(city.getName(), city.getState());
+        if (existingCity.isPresent()) {
             throw new NameCityAlreadyRegisteredException("City name already registered");
         }
 

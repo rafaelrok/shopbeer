@@ -26,8 +26,8 @@ public class SaleService {
 
     @Transactional
     public Sale save(Sale sale) {
-        if (sale.isSalvarProibido()) {
-            throw new RuntimeException("Usuário tentando salvar uma venda proibida");
+        if (sale.isSaveForbidden()) {
+            throw new RuntimeException("User trying to save a prohibited sale");
         }
 
         if (sale.isNew()) {

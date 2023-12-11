@@ -98,28 +98,28 @@ public class Sale {
 				.orElse(BigDecimal.ZERO);
 	}
 	
-	public void calcularValorTotal() {
-		this.amount = calcularValorTotal(getAmountItens(), getValueShipping(), getValueDiscount());
+	public void calculateTotalValue() {
+		this.amount = calculateTotalValue(getAmountItens(), getValueShipping(), getValueDiscount());
 	}
 	
-	public Long getDiasCriacao() {
-		LocalDate inicio = createDate != null ? createDate.toLocalDate() : LocalDate.now();
-		return ChronoUnit.DAYS.between(inicio, LocalDate.now());
+	public Long getCreationDays() {
+		LocalDate start = createDate != null ? createDate.toLocalDate() : LocalDate.now();
+		return ChronoUnit.DAYS.between(start, LocalDate.now());
 	}
 	
-	public boolean isSalvarPermitido() {
+	public boolean isSaveAllowed() {
 		return !status.equals(StatusSale.CANCELED);
 	}
 	
-	public boolean isSalvarProibido() {
-		return !isSalvarPermitido();
+	public boolean isSaveForbidden() {
+		return !isSaveAllowed();
 	}
 	
-	private BigDecimal calcularValorTotal(BigDecimal valorTotalItens, BigDecimal valorFrete, BigDecimal valorDesconto) {
-		BigDecimal valorTotal = valorTotalItens
-				.add(Optional.ofNullable(valorFrete).orElse(BigDecimal.ZERO))
-				.subtract(Optional.ofNullable(valorDesconto).orElse(BigDecimal.ZERO));
-		return valorTotal;
+	private BigDecimal calculateTotalValue(BigDecimal totalValueItems, BigDecimal valueShipping, BigDecimal valueDiscount) {
+		BigDecimal amount = totalValueItems
+				.add(Optional.ofNullable(valueShipping).orElse(BigDecimal.ZERO))
+				.subtract(Optional.ofNullable(valueDiscount).orElse(BigDecimal.ZERO));
+		return amount;
 	}
 
 	@Override

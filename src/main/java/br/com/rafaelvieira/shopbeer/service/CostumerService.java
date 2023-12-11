@@ -19,8 +19,8 @@ public class CostumerService {
 
     @Transactional
     public void save(Costumer costumer) {
-        Optional<Costumer> clienteExistente = costumerRepository.findByCpfOrCnpj(costumer.getCpfOrCnpjNoFormatting());
-        if (clienteExistente.isPresent()) {
+        Optional<Costumer> existingCostumer = costumerRepository.findByCpfOrCnpj(costumer.getCpfOrCnpjNoFormatting());
+        if (existingCostumer.isPresent()) {
             throw new CpfCnpjCustomerAlreadyRegisteredException("CPF/CNPJ already registered");
         }
 
