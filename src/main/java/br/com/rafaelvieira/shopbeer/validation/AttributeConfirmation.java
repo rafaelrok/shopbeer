@@ -17,7 +17,7 @@ import jakarta.validation.constraints.Pattern;
 public @interface AttributeConfirmation {
 
 	@OverridesAttribute(constraint = Pattern.class, name = "message")
-	String message() default "Atributos não conferem";
+	String message() default "Attributes do not match";
 	
 	Class<?>[] groups() default {};
 	Class<? extends Payload>[] payload() default {};

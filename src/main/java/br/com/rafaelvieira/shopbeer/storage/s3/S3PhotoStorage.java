@@ -24,12 +24,11 @@ import com.amazonaws.util.IOUtils;
 
 import net.coobird.thumbnailator.Thumbnails;
 
-@Profile("!prod")
+//@Profile("dev")
 @Component
 public class S3PhotoStorage implements PhotoStorage {
 
     private static final Logger logger = LoggerFactory.getLogger(S3PhotoStorage.class);
-
     private static final String BUCKET = "aw-shopbeer-photo";
     private final AmazonS3 amazonS3;
 
@@ -82,7 +81,7 @@ public class S3PhotoStorage implements PhotoStorage {
     @Override
     public String getUrl(String photo) {
         if (!StringUtils.hasText(photo)) {
-            return "https://s3-us-west-2.amazonaws.com/aw-shopbeer-photos/" + photo;
+            return "https://s3-us-west-1.amazonaws.com/aw-shopbeer-photo/" + photo;
         }
 
         return null;

@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="pt" xmlns="http://www.w3.org/1999/xhtml" 
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/LayoutDefault}"
+	  xmlns:shopbeer="http://shopbeer.rafaelvieira.com.br"
+	xmlns:data="http://www.thymeleaf.org/extras/data"
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
+	
+<head>
+	<title>Pesquisa de clientes</title>
+</head>
+
+<body>
+<section layout:fragment="conteudo">
+	<div class="page-header">
+		<div class="container-fluid">
+			<div class="row">
+				<div class="col-xs-10">
+					<h1>Pesquisa de cidades</h1>
+				</div>
+				
+				<div class="col-xs-2" sec:authorize-url="/cities/new">
+					<div class="aw-page-header-controls">
+						<a class="btn  btn-default" th:href="@{/cities/new}">
+							<i class="glyphicon  glyphicon-plus-sign"></i> <span class="hidden-xs  hidden-sm">Nova cidade</span>
+						</a>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	<div class="container-fluid">
+		<form method="GET" th:object="${cityFilter}">
+			<div class="row">
+				<div class="form-groupEmployee  col-sm-4">
+					<label for="state">Estado</label>
+					<select id="state" class="form-control" th:field="*{state}">
+	                    <option value="">Todos</option>
+	                    <option th:each="estado : ${states}" th:value="${state.code}" th:text="${state.name}">São Paulo</option>
+	                </select>
+				</div>
+				
+				<div class="form-groupEmployee  col-sm-8">
+					<label for="name">Nome</label>
+					<input type="text" class="form-control" id="name" th:field="*{name}"/>
+				</div>
+			</div>
+			
+			<button type="submit" class="btn  btn-primary">Pesquisar</button>
+		</form>
+		
+		<div class="table-responsive  bw-tabela-simples">
+			<table class="table  table-hover">
+				<thead>
+					<tr>
+						<th class="table-cidades-col-nome">
+							<shopbeer:order page="${page}" field="name" text="Nome"/>
+						</th>
+						<th class="table-cidades-col-estado">
+							<shopbeer:order page="${page}" field="state" text="Estado"/>
+						</th>
+						<th class="table-col-acoes" sec:authorize="hasRole('ROLE_REGISTER_CITY')"></th>
+					</tr>
+				</thead>
+				
+				<tbody>
+					<tr th:each="city : ${page.content}">
+						<td th:text="${city.name}"></td>
+						<td class="text-right" th:text="${city.state.name}">São Paulo</td>
+						<td class="text-center" sec:authorize="hasRole('ROLE_REGISTER_CITY')">
+							<a class="btn  btn-link  btn-xs" title="Editar"> 
+								<i class="glyphicon glyphicon-pencil"></i>
+							</a>
+							<a class="btn  btn-link  btn-xs" title="Excluir">
+								<i class="glyphicon glyphicon-remove"></i>
+							</a>
+						</td>
+					</tr>
+					<tr th:if="${page.empyt}">
+						<td colspan="3">Nenhuma cidade encontrada</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		
+		<shopbeer:pagination page="${page}"/>
+		
+	</div>
+</section>
+</body>
+</html>

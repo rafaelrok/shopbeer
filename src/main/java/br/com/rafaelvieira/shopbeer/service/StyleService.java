@@ -2,9 +2,12 @@ package br.com.rafaelvieira.shopbeer.service;
 
 import br.com.rafaelvieira.shopbeer.domain.Style;
 import br.com.rafaelvieira.shopbeer.repository.StyleRepository;
+import br.com.rafaelvieira.shopbeer.repository.filter.StyleFilter;
+import br.com.rafaelvieira.shopbeer.repository.query.style.StylesQuery;
 import br.com.rafaelvieira.shopbeer.service.exception.NameStyleAlreadyRegisteredException;
-import jakarta.transaction.Transactional;
+
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -12,9 +15,17 @@ import java.util.Optional;
 public class StyleService {
 
     private final StyleRepository styleRepository;
+    private final StylesQuery stylesQuery;
 
-    public StyleService(StyleRepository styleRepository) {
+    public StyleService(StyleRepository styleRepository, StylesQuery stylesQuery) {
         this.styleRepository = styleRepository;
+        this.stylesQuery = stylesQuery;
+    }
+
+    @Transactional(readOnly = true)
+    public Style filtered(StyleFilter filter) {
+        return stylesQuery.filtered(filter, null).getContent().get(0);
+
     }
 
     @Transactional

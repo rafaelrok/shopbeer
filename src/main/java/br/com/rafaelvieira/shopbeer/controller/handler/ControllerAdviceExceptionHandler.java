@@ -1,16 +1,15 @@
-package com.algaworks.brewer.controller.handler;
+package br.com.rafaelvieira.shopbeer.controller.handler;
 
+import br.com.rafaelvieira.shopbeer.service.exception.NameStyleAlreadyRegisteredException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
-import com.algaworks.brewer.service.exception.NomeEstiloJaCadastradoException;
-
 @ControllerAdvice
 public class ControllerAdviceExceptionHandler {
 
-	@ExceptionHandler(NomeEstiloJaCadastradoException.class)
-	public ResponseEntity<String> handleNomeEstiloJaCadastradoException(NomeEstiloJaCadastradoException e) {
+	@ExceptionHandler(NameStyleAlreadyRegisteredException.class)
+	public ResponseEntity<String> handleNameStyleAlreadyRegisteredException(NameStyleAlreadyRegisteredException e) {
 		return ResponseEntity.badRequest().body(e.getMessage());
 	}
 	

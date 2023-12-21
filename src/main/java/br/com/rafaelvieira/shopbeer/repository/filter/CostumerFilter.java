@@ -12,6 +12,6 @@ public class CostumerFilter {
 	private String cpfOrCnpj;
 
 	public Object getCpfOrCnpjNoFormatting() {
-		return TypePerson.removeformatting(this.cpfOrCnpj);
+		return TypePerson.removeFormatting(this.cpfOrCnpj);
 	}
 }

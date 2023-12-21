@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="pt" xmlns="http://www.w3.org/1999/xhtml" 
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/LayoutDefault}"
+	xmlns:shopbeer="http://shopbeer.rafaelvieira.com.br">
+
+<head>
+	<title>Pesquisa de cervejas</title>
+</head>
+
+<body>
+<section layout:fragment="conteudo">
+	<div class="page-header">
+		<div class="container-fluid">
+			<div class="row">
+				<div class="col-xs-10">
+					<h1>Pesquisa de cervejas</h1>
+				</div>
+				
+				<div class="col-xs-2">
+					<div class="aw-page-header-controls">
+						<a class="btn  btn-default" th:href="@{/beers/new}">
+							<i class="glyphicon  glyphicon-plus-sign"></i> <span class="hidden-xs  hidden-sm">Nova cerveja</span>
+						</a>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	<div class="container-fluid">
+		<form method="GET" th:object="${beerFilter}">
+			<div class="row">
+				<div class="form-groupEmployee  col-sm-6">
+					<label class="control-label" for="sku">SKU</label>
+					<input type="text" class="form-control" id="sku" autofocus="autofocus" th:field="*{sku}"/>
+				</div>
+				
+				<div class="form-groupEmployee  col-sm-6" >
+					<label class="control-label" for="nome">Nome</label>
+					<input type="text" class="form-control" id="nome" th:field="*{name}"/>
+				</div>
+			</div>
+			
+			<div class="row">
+				<div class="form-groupEmployee  col-sm-6">
+					<label class="control-label" for="estilo">Estilo</label>
+					<select id="estilo" class="form-control" th:field="*{style}">
+	                    <option value="">Todos os estilos</option>
+	                    <option th:each="estilo : ${styles}" th:text="${style.name}" th:value="${style.code}"></option>
+	                </select>
+				</div>
+				
+				<div class="form-groupEmployee  col-sm-6">
+					<label class="control-label" for="sabor">Sabor</label> 
+					<select id="sabor" class="form-control" th:field="*{flavor}">
+	                    <option value="">Todos os sabores</option>
+	                    <option th:each="sabor : ${flavors}" th:value="${flavor}" th:text="${flavor.descripion}"></option>
+	                </select>
+				</div>
+			</div>
+			
+			<div class="row">
+				<div class="form-groupEmployee  col-sm-6">
+					<label class="control-label">Origem</label> 
+					<div>
+	  					<th:block th:each="origem : ${origins}">
+	  						<div class="radio  radio-inline">
+		    					<input th:id="|id_${origin}|" type="radio" th:value="${origin}" th:field="*{origin}"/>
+		    					<label th:for="|id_${origin}|" th:text="${origin.description}">Nacional</label>
+	    					</div>
+	  					</th:block>
+	  					<div class="radio  radio-inline">
+		    				<input id="todasOrigens" type="radio" th:checked="*{origin} == null" name="origem"/>
+		    				<label for="todasOrigens" >Todas</label>
+	    				</div>
+					</div>
+				</div>
+
+				<div class="col-sm-6  form-groupEmployee">
+					<label for="valorDe">Valor unitário</label>
+					<div class="form-inline">
+						<input type="text" class="form-control  aw-form-control-inline-sm  js-decimal" id="valorDe" th:field="*{valueOf}"/>
+						<label for="valorAte" class="aw-form-label-between">até</label>
+						<input type="text" class="form-control  aw-form-control-inline-sm  js-decimal" id="valorAte" th:field="*{valueUpto}"/>
+					</div>
+				</div>
+			</div>
+			
+			<button type="submit" class="btn  btn-primary">Pesquisar</button>
+		</form>
+		
+		<div class="table-responsive  bw-tabela-simples">
+			<table class="table  table-hover">
+				<thead>
+					<tr>
+						<th class="table-cervejas-col-foto"></th>
+						<th class="table-cervejas-col-sku">
+							<shopbeer:order page="${page}" field="sku" text="SKU"/>
+						</th>
+						<th class="table-cervejas-col-nome">
+							<shopbeer:order page="${page}" field="name" text="Nome"/>
+						</th>
+						<th class="table-cervejas-col-estilo">Estilo</th>
+						<th class="table-cervejas-col-origem">Origem</th>
+						<th class="table-cervejas-col-valor">Valor</th>
+						<th class="table-cervejas-col-acoes"></th>
+					</tr>
+				</thead>
+				
+				<tbody>
+					<tr th:each="cerveja : ${page.content}">
+						<td class="text-center">
+							<!-- <img th:src="@{/fotos/thumbnail.{foto}(foto=${beer.fotoOuMock})}" class="img-responsive"/> -->
+							<img th:src="${beer.urlThumbnailFoto}" class="img-responsive"/>
+						</td>
+						<td class="text-center" th:text="${beer.sku}">AA1234</td>
+						<td th:text="${beer.name}">Cerveja Stella</td>
+						<td th:text="${beer.style.name}">Lager</td>
+						<td th:text="${beer.origem.description}">Internacional</td>
+						<td class="text-right" th:text="|R$ ${{beer.value}}|">R$ 8.00</td>
+						<td class="text-center">
+							<a class="btn  btn-link  btn-xs  js-tooltip" title="Editar" 
+									th:href="@{/beers/{code}(code=${beer.code})}">
+								<i class="glyphicon glyphicon-pencil"></i>
+							</a>
+							<a class="btn  btn-link  btn-xs  js-tooltip  js-exclusion-btn" title="Excluir" href="#"
+									data:url="@{/beers/{code}(code=${beer.code})}"
+									data:object="${beer.name}">
+								<i class="glyphicon glyphicon-remove"></i>
+							</a>
+						</td>
+					</tr>
+					<tr th:if="${page.isEmpty}">
+						<td colspan="7">Nenhuma cerveja encontrada</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		
+		<shopbeer:pagination page="${page}"/>
+		
+	</div>
+
+</section>
+</body>
+</html>

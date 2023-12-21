@@ -13,14 +13,14 @@ public class CostumerGroupSequenceProvider implements DefaultGroupSequenceProvid
 		List<Class<?>> grupos = new ArrayList<>();
 		grupos.add(Costumer.class);
 		
-		if (isPessoaSelecionada(costumer)) {
+		if (isPersonSelecionada(costumer)) {
 			grupos.add(costumer.getTypePerson().getGroup());
 		}
 		
 		return grupos;
 	}
 
-	private boolean isPessoaSelecionada(Costumer costumer) {
+	private boolean isPersonSelecionada(Costumer costumer) {
 		return costumer != null && costumer.getTypePerson() != null;
 	}
 

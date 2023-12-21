@@ -86,7 +86,7 @@ public class Sale {
 		return code == null;
 	}
 	
-	public void AddItems(List<ItemSale> itens) {
+	public void addItems(List<ItemSale> itens) {
 		this.itens = itens;
 		this.itens.forEach(i -> i.setSale(this));
 	}

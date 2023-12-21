@@ -1,36 +1,35 @@
-package com.algaworks.brewer.controller;
+package br.com.rafaelvieira.shopbeer.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
+import br.com.rafaelvieira.shopbeer.repository.CostumerRepository;
+import br.com.rafaelvieira.shopbeer.repository.query.beer.BeersQuery;
+import br.com.rafaelvieira.shopbeer.repository.query.sale.SalesQuery;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.algaworks.brewer.repository.Cervejas;
-import com.algaworks.brewer.repository.Clientes;
-import com.algaworks.brewer.repository.Vendas;
-
-@Controller
+@RestController
 public class DashboardController {
 
-	@Autowired
-	private Vendas vendas;
-	
-	@Autowired
-	private Cervejas cervejas;
-	
-	@Autowired
-	private Clientes clientes;
-	
-	@GetMapping("/")
+	private final SalesQuery salesQuery;
+	private final BeersQuery beersQuery;
+	private final CostumerRepository costumerRepository;
+
+    public DashboardController(SalesQuery salesQuery, BeersQuery beersQuery, CostumerRepository costumerRepository) {
+        this.salesQuery = salesQuery;
+        this.beersQuery = beersQuery;
+        this.costumerRepository = costumerRepository;
+    }
+
+    @GetMapping("/")
 	public ModelAndView dashboard() {
 		ModelAndView mv = new ModelAndView("Dashboard");
 		
-		mv.addObject("vendasNoAno", vendas.valorTotalNoAno());
-		mv.addObject("vendasNoMes", vendas.valorTotalNoMes());
-		mv.addObject("ticketMedio", vendas.valorTicketMedioNoAno());
+		mv.addObject("totalValueInYear", salesQuery.totalValueInYear());
+		mv.addObject("totalValueInMonth", salesQuery.totalValueInMonth());
+		mv.addObject("ticketMedia", salesQuery.averageTicketValueInYear());
 		
-		mv.addObject("valorItensEstoque", cervejas.valorItensEstoque());
-		mv.addObject("totalClientes", clientes.count());
+		mv.addObject("stockItemValue", beersQuery.stockItemValue());
+		mv.addObject("totalCostumers", costumerRepository.count());
 		
 		return mv;
 	}

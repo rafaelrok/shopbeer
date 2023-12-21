@@ -1,215 +1,205 @@
-package com.algaworks.brewer.controller;
+package br.com.rafaelvieira.shopbeer.controller;
 
-import java.util.List;
-import java.util.UUID;
-
-import javax.servlet.http.HttpServletRequest;
-
-import org.springframework.beans.factory.annotation.Autowired;
+import br.com.rafaelvieira.shopbeer.controller.page.PageWrapper;
+import br.com.rafaelvieira.shopbeer.controller.validator.SaleValidator;
+import br.com.rafaelvieira.shopbeer.domain.Beer;
+import br.com.rafaelvieira.shopbeer.domain.ItemSale;
+import br.com.rafaelvieira.shopbeer.domain.Sale;
+import br.com.rafaelvieira.shopbeer.domain.dto.OriginSalesDTO;
+import br.com.rafaelvieira.shopbeer.domain.dto.SalesMonthDTO;
+import br.com.rafaelvieira.shopbeer.domain.enums.StatusSale;
+import br.com.rafaelvieira.shopbeer.domain.enums.TypePerson;
+import br.com.rafaelvieira.shopbeer.mail.Mailer;
+import br.com.rafaelvieira.shopbeer.repository.BeerRepository;
+import br.com.rafaelvieira.shopbeer.repository.filter.SaleFilter;
+import br.com.rafaelvieira.shopbeer.repository.query.sale.SalesQuery;
+import br.com.rafaelvieira.shopbeer.security.UserEmployeeSystem;
+import br.com.rafaelvieira.shopbeer.service.SaleService;
+import br.com.rafaelvieira.shopbeer.session.TablesItemsSession;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.stereotype.Controller;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import com.algaworks.brewer.controller.page.PageWrapper;
-import com.algaworks.brewer.controller.validator.VendaValidator;
-import com.algaworks.brewer.dto.VendaMes;
-import com.algaworks.brewer.dto.VendaOrigem;
-import com.algaworks.brewer.mail.Mailer;
-import com.algaworks.brewer.model.Cerveja;
-import com.algaworks.brewer.model.ItemVenda;
-import com.algaworks.brewer.model.StatusVenda;
-import com.algaworks.brewer.model.TipoPessoa;
-import com.algaworks.brewer.model.Venda;
-import com.algaworks.brewer.repository.Cervejas;
-import com.algaworks.brewer.repository.Vendas;
-import com.algaworks.brewer.repository.filter.VendaFilter;
-import com.algaworks.brewer.security.UsuarioSistema;
-import com.algaworks.brewer.service.CadastroVendaService;
-import com.algaworks.brewer.session.TabelasItensSession;
+import java.util.List;
+import java.util.UUID;
 
-@Controller
-@RequestMapping("/vendas")
+
+@RestController
+@RequestMapping("/sales")
 public class SaleController {
-	
-	@Autowired
-	private Cervejas cervejas;
-	
-	@Autowired
-	private TabelasItensSession tabelaItens;
-	
-	@Autowired
-	private CadastroVendaService cadastroVendaService;
-	
-	@Autowired
-	private VendaValidator vendaValidator;
-	
-	@Autowired
-	private Vendas vendas;
-	
-	@Autowired
-	private Mailer mailer;
-	
-	@GetMapping("/nova")
-	public ModelAndView nova(Venda venda) {
-		ModelAndView mv = new ModelAndView("venda/CadastroVenda");
+
+	private final BeerRepository beerRepository;
+	private final TablesItemsSession tablesItemsSession;
+	private final SaleService saleService;
+	private final SaleValidator saleValidator;
+	private final Mailer mailer;
+	private final SalesQuery salesQuery;
+
+    public SaleController(BeerRepository beerRepository, TablesItemsSession tablesItemsSession, SaleService saleService,
+                          SaleValidator saleValidator, Mailer mailer, SalesQuery salesQuery) {
+        this.beerRepository = beerRepository;
+        this.tablesItemsSession = tablesItemsSession;
+        this.saleService = saleService;
+        this.saleValidator = saleValidator;
+        this.mailer = mailer;
+        this.salesQuery = salesQuery;
+    }
+
+    @GetMapping("/new")
+	public ModelAndView newSale(Sale sale) {
+		ModelAndView mv = new ModelAndView("sale/register-sale");
 		
-		setUuid(venda);
+		setUuid(sale);
 		
-		mv.addObject("itens", venda.getItens());
-		mv.addObject("valorFrete", venda.getValorFrete());
-		mv.addObject("valorDesconto", venda.getValorDesconto());
-		mv.addObject("valorTotalItens", tabelaItens.getValorTotal(venda.getUuid()));
+		mv.addObject("itens", sale.getItens());
+		mv.addObject("tValueShipping", sale.getValueShipping());
+		mv.addObject("ValueDiscount", sale.getValueDiscount());
+		mv.addObject("Amount", tablesItemsSession.getAmount(sale.getUuid()));
 		
 		return mv;
 	}
 	
-	@PostMapping(value = "/nova", params = "salvar")
-	public ModelAndView salvar(Venda venda, BindingResult result, RedirectAttributes attributes, @AuthenticationPrincipal UsuarioSistema usuarioSistema) {
-		validarVenda(venda, result);
+	@PostMapping(value = "/new", params = "save")
+	public ModelAndView salvar(Sale sale, BindingResult result, RedirectAttributes attributes, @AuthenticationPrincipal UserEmployeeSystem userEmployeeSystem) {
+		validSale(sale, result);
 		if (result.hasErrors()) {
-			return nova(venda);
+			return newSale(sale);
 		}
 		
-		venda.setUsuario(usuarioSistema.getUsuario());
+		sale.setUserEmployee(userEmployeeSystem.getUserEmployee());
 		
-		cadastroVendaService.salvar(venda);
-		attributes.addFlashAttribute("mensagem", "Venda salva com sucesso");
-		return new ModelAndView("redirect:/vendas/nova");
+		saleService.save(sale);
+		attributes.addFlashAttribute("message", "Successfully saved sale");
+		return new ModelAndView("redirect:/sales/new");
 	}
 
-	@PostMapping(value = "/nova", params = "emitir")
-	public ModelAndView emitir(Venda venda, BindingResult result, RedirectAttributes attributes, @AuthenticationPrincipal UsuarioSistema usuarioSistema) {
-		validarVenda(venda, result);
+	@PostMapping(value = "/new", params = "issue")
+	public ModelAndView issue(Sale sale, BindingResult result, RedirectAttributes attributes, @AuthenticationPrincipal UserEmployeeSystem userEmployeeSystem) {
+		validSale(sale, result);
 		if (result.hasErrors()) {
-			return nova(venda);
+			return newSale(sale);
 		}
 		
-		venda.setUsuario(usuarioSistema.getUsuario());
+		sale.setUserEmployee(userEmployeeSystem.getUserEmployee());
 		
-		cadastroVendaService.emitir(venda);
-		attributes.addFlashAttribute("mensagem", "Venda emitida com sucesso");
-		return new ModelAndView("redirect:/vendas/nova");
+		saleService.issue(sale);
+		attributes.addFlashAttribute("message", "Successfully issued sale");
+		return new ModelAndView("redirect:/sales/new");
 	}
 	
-	@PostMapping(value = "/nova", params = "enviarEmail")
-	public ModelAndView enviarEmail(Venda venda, BindingResult result, RedirectAttributes attributes, @AuthenticationPrincipal UsuarioSistema usuarioSistema) {
-		validarVenda(venda, result);
+	@PostMapping(value = "/new", params = "sendEmail")
+	public ModelAndView sendEmail(Sale sale, BindingResult result, RedirectAttributes attributes, @AuthenticationPrincipal UserEmployeeSystem userEmployeeSystem) {
+		validSale(sale, result);
 		if (result.hasErrors()) {
-			return nova(venda);
+			return newSale(sale);
 		}
+
+		sale.setUserEmployee(userEmployeeSystem.getUserEmployee());
+
+		sale = saleService.save(sale);
+		mailer.send(sale);
 		
-		venda.setUsuario(usuarioSistema.getUsuario());
-		
-		venda = cadastroVendaService.salvar(venda);
-		mailer.enviar(venda);
-		
-		attributes.addFlashAttribute("mensagem", String.format("Venda nº %d salva com sucesso e e-mail enviado", venda.getCodigo()));
-		return new ModelAndView("redirect:/vendas/nova");
+		attributes.addFlashAttribute("message", String.format("Sale nº %d saved successfully and email sent", sale.getCode()));
+		return new ModelAndView("redirect:/sales/new");
 	}
 	
 	@PostMapping("/item")
-	public ModelAndView adicionarItem(Long codigoCerveja, String uuid) {
-		Cerveja cerveja = cervejas.getOne(codigoCerveja);
-		tabelaItens.adicionarItem(uuid, cerveja, 1);
-		return mvTabelaItensVenda(uuid);
+	public ModelAndView addItem(Long codeBeer, String uuid) {
+		Beer beer = beerRepository.getReferenceById(codeBeer);
+		tablesItemsSession.addItem(uuid, beer, 1);
+		return mvTableItensSale(uuid);
 	}
 	
-	@PutMapping("/item/{codigoCerveja}")
-	public ModelAndView alterarQuantidadeItem(@PathVariable("codigoCerveja") Cerveja cerveja
-			, Integer quantidade, String uuid) {
-		tabelaItens.alterarQuantidadeItens(uuid, cerveja, quantidade);
-		return mvTabelaItensVenda(uuid);
+	@PutMapping("/item/{codeBeer}")
+	public ModelAndView changeQuantityItem(@PathVariable("codeBeer") Beer beer
+			, Integer quantity, String uuid) {
+		tablesItemsSession.changeQuantityItems(uuid, beer, quantity);
+		return mvTableItensSale(uuid);
 	}
 	
-	@DeleteMapping("/item/{uuid}/{codigoCerveja}")
-	public ModelAndView excluirItem(@PathVariable("codigoCerveja") Cerveja cerveja
+	@DeleteMapping("/item/{uuid}/{codeBeer}")
+	public ModelAndView deleteItem(@PathVariable("codeBeer") Beer beer
 			, @PathVariable String uuid) {
-		tabelaItens.excluirItem(uuid, cerveja);
-		return mvTabelaItensVenda(uuid);
+		tablesItemsSession.deleteItem(uuid, beer);
+		return mvTableItensSale(uuid);
 	}
 	
 	@GetMapping
-	public ModelAndView pesquisar(VendaFilter vendaFilter,
-			@PageableDefault(size = 10) Pageable pageable, HttpServletRequest httpServletRequest) {
-		ModelAndView mv = new ModelAndView("venda/PesquisaVendas");
-		mv.addObject("todosStatus", StatusVenda.values());
-		mv.addObject("tiposPessoa", TipoPessoa.values());
+	public ModelAndView search(SaleFilter filter,
+								  @PageableDefault(size = 10) Pageable pageable, HttpServletRequest httpServletRequest) {
+		ModelAndView mv = new ModelAndView("sale/search-sales");
+		mv.addObject("allStatus", StatusSale.values());
+		mv.addObject("typePerson", TypePerson.values());
 		
-		PageWrapper<Venda> paginaWrapper = new PageWrapper<>(vendas.filtrar(vendaFilter, pageable)
+		PageWrapper<Sale> paginaWrapper = new PageWrapper<>(salesQuery.filtered(filter, pageable)
 				, httpServletRequest);
-		mv.addObject("pagina", paginaWrapper);
+		mv.addObject("page", paginaWrapper);
 		return mv;
 	}
 	
-	@GetMapping("/{codigo}")
-	public ModelAndView editar(@PathVariable Long codigo) {
-		Venda venda = vendas.buscarComItens(codigo);
+	@GetMapping("/{code}")
+	public ModelAndView edit(@PathVariable Long code) {
+		Sale sale = salesQuery.searchWithItems(code);
 		
-		setUuid(venda);
-		for (ItemVenda item : venda.getItens()) {
-			tabelaItens.adicionarItem(venda.getUuid(), item.getCerveja(), item.getQuantidade());
+		setUuid(sale);
+		for (ItemSale item : sale.getItens()) {
+			tablesItemsSession.addItem(sale.getUuid(), item.getBeer(), item.getQuantity());
 		}
 		
-		ModelAndView mv = nova(venda);
-		mv.addObject(venda);
+		ModelAndView mv = newSale(sale);
+		mv.addObject(sale);
 		return mv;
 	}
 	
-	@PostMapping(value = "/nova", params = "cancelar")
-	public ModelAndView cancelar(Venda venda, BindingResult result
-				, RedirectAttributes attributes, @AuthenticationPrincipal UsuarioSistema usuarioSistema) {
+	@PostMapping(value = "/new", params = "cancel")
+	public ModelAndView cancel(Sale sale, BindingResult result
+				, RedirectAttributes attributes, @AuthenticationPrincipal UserEmployeeSystem userEmployeeSystem) {
 		try {
-			cadastroVendaService.cancelar(venda);
+			saleService.cancel(sale);
 		} catch (AccessDeniedException e) {
 			ModelAndView mv = new ModelAndView("error");
 			mv.addObject("status", 403);
 			return mv;
 		}
 		
-		attributes.addFlashAttribute("mensagem", "Venda cancelada com sucesso");
-		return new ModelAndView("redirect:/vendas/" + venda.getCodigo());
+		attributes.addFlashAttribute("message", "Sale successfully canceled");
+		return new ModelAndView("redirect:/sales/" + sale.getCode());
 	}
 	
-	@GetMapping("/totalPorMes")
-	public @ResponseBody List<VendaMes> listarTotalVendaPorMes() {
-		return vendas.totalPorMes();
+	@GetMapping("/total-by-month")
+	public List<SalesMonthDTO> listarTotalVendaPorMes() {
+		return salesQuery.totalByMonth();
 	}
 	
-	@GetMapping("/porOrigem")
-	public @ResponseBody List<VendaOrigem> vendasPorNacionalidade() {
-		return this.vendas.totalPorOrigem();
+	@GetMapping("/by-origin")
+	public List<OriginSalesDTO> salesByNationality() {
+		return this.salesQuery.totalByOrigin();
 	}
 	
-	private ModelAndView mvTabelaItensVenda(String uuid) {
-		ModelAndView mv = new ModelAndView("venda/TabelaItensVenda");
-		mv.addObject("itens", tabelaItens.getItens(uuid));
-		mv.addObject("valorTotal", tabelaItens.getValorTotal(uuid));
+	private ModelAndView mvTableItensSale(String uuid) {
+		ModelAndView mv = new ModelAndView("sale/table-itens-sale");
+		mv.addObject("itens", tablesItemsSession.getItens(uuid));
+		mv.addObject("Amount", tablesItemsSession.getAmount(uuid));
 		return mv;
 	}
 	
-	private void validarVenda(Venda venda, BindingResult result) {
-		venda.adicionarItens(tabelaItens.getItens(venda.getUuid()));
-		venda.calcularValorTotal();
+	private void validSale(Sale sale, BindingResult result) {
+		sale.addItems(tablesItemsSession.getItens(sale.getUuid()));
+		sale.calculateTotalValue();
 		
-		vendaValidator.validate(venda, result);
+		saleValidator.validate(sale, result);
 	}
 	
-	private void setUuid(Venda venda) {
-		if (StringUtils.isEmpty(venda.getUuid())) {
-			venda.setUuid(UUID.randomUUID().toString());
+	private void setUuid(Sale sale) {
+		if (StringUtils.hasText(sale.getUuid())) {
+			sale.setUuid(UUID.randomUUID().toString());
 		}
 	}
 

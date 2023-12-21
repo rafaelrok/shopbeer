@@ -15,23 +15,26 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.query.QueryUtils;
+import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Component
 public class StylesImpl implements StylesQuery {
 	
 	@PersistenceContext
 	private EntityManager manager;
 	
-	private final PaginationUtil paginacaoUtil;
+	private final PaginationUtil paginationUtil;
 
-	public StylesImpl(PaginationUtil paginacaoUtil) {
-		this.paginacaoUtil = paginacaoUtil;
+	public StylesImpl(PaginationUtil paginationUtil) {
+		this.paginationUtil = paginationUtil;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	@Transactional(readOnly = true)
 	public Page<Style> filtered(StyleFilter filter, Pageable pageable) {
@@ -45,7 +48,7 @@ public class StylesImpl implements StylesQuery {
 		// Add ordering and pagination
 		cq.orderBy(QueryUtils.toOrders(pageable.getSort(), style, cb));
 		TypedQuery<Style> query = manager.createQuery(cq);
-		paginacaoUtil.prepare(cb, pageable);
+		paginationUtil.prepare(cb, pageable);
 
 		return new PageImpl<>(query.getResultList(), pageable, total(filter));
 	}
@@ -65,10 +68,9 @@ public class StylesImpl implements StylesQuery {
 	private void addFilter(StyleFilter filter, CriteriaBuilder cb, CriteriaQuery<?> cq, Root<Style> style) {
 		List<Predicate> predicates = new ArrayList<>();
 
-		if (filter != null) {
-			if (!StringUtils.hasText(filter.getName())) {
+		if (filter != null && (!StringUtils.hasText(filter.getName()))) {
 				predicates.add(cb.like(cb.lower(style.get("name")), "%" + filter.getName().toLowerCase() + "%"));
-			}
+
 		}
 
 		cq.where(predicates.toArray(new Predicate[0]));

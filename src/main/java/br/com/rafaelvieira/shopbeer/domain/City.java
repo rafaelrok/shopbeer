@@ -34,7 +34,7 @@ public class City implements Serializable {
 	@ToString.Exclude
 	private State state;
 	
-	public boolean temEstado() {
+	public boolean hasState() {
 		return state != null;
 	}
 

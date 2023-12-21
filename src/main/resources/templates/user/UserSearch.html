@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="pt" xmlns="http://www.w3.org/1999/xhtml" 
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/LayoutDefault}"
+	  xmlns:shopbeer="http://shopbeer.rafaelvieira.com.br"
+	xmlns:data="http://www.thymeleaf.org/extras/data"
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
+	
+<head>
+	<title>Pesquisa de usuários</title>
+</head>
+
+<body>
+<section layout:fragment="conteudo">
+	<div class="page-header">
+		<div class="container-fluid">
+			<div class="row">
+				<div class="col-xs-10">
+					<h1>Pesquisa de usu&aacute;rios</h1>
+				</div>
+				
+				<div class="col-xs-2">
+					<div class="aw-page-header-controls">
+						<a class="btn  btn-default" th:href="@{/userEmployees/new}">
+							<i class="glyphicon  glyphicon-plus-sign"></i> <span class="hidden-xs  hidden-sm">Novo usu&aacute;
+							rio</span>
+						</a>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	<div class="container-fluid">
+		<form method="GET" th:object="${userEmployeeFilter}" th:action="@{/userEmployees}">
+			<div class="row">
+				<div class="form-groupEmployee  col-sm-6">
+					<label class="control-label" for="name">Nome</label>
+					<input type="text" class="form-control" id="name" autofocus="autofocus" th:field="*{name}"/>
+				</div>
+				
+				<div class="form-groupEmployee  col-sm-6">
+					<label class="control-label" for="email">E-mail</label>
+					<input type="text" class="form-control" id="email" th:field="*{email}"/>
+				</div>
+			</div>
+			
+			<div class="row">
+				<div class="form-groupEmployee  col-sm-12">
+					<label class="control-label">Grupos</label> 
+					<div>
+						<th:block th:each="groupEmployee : ${groups}">
+	  						<div class="checkbox  checkbox-inline"> 
+		    					<input type="checkbox" th:value="${groupEmployee.code}" th:field="*{groups}"/>
+		    					<label th:for="${#ids.prev('groups')}" th:text="${groupEmployee.name}">Administrador</label>
+	    					</div>
+	    				</th:block>
+					</div>
+  				</div>
+			</div>
+			
+			<button type="submit" class="btn  btn-primary">Pesquisar</button>
+		</form>
+		
+		<div class="aw-datatable-toolbar">
+			<button class="btn btn-default  btn-xs  js-status-btn  disabled" data:status="ACTIVATE" data:url="@{/userEmployees/status}">
+				<span>Ativar</span>
+			</button>
+			
+			<button class="btn btn-default  btn-xs  js-status-btn  disabled" data:status="DISABLE" data:url="@{/userEmployees/status}">
+				<span>Desativar</span>
+			</button>
+		</div>
+
+		<div class="table-responsive  bw-tabela-simples">
+        	<table class="table  table-hover">
+	            <thead>
+	            	<tr>
+	            		<th class="table-userEmployees-col-status">
+	            			<div class="checkbox  aw-checkbox-no-margin">
+	            				<input type="checkbox" class="js-select-all"/>
+	            				<label></label>
+	            			</div>
+	            		</th>
+	            		<th>Nome</th>
+	                	<th>E-mail</th>
+	                	<th>Grupo</th>
+	                	<th>Status</th>
+	                 	<th class="table-col-acoes"></th>
+					</tr>
+				</thead>
+			
+	            <tbody>
+					<tr th:each="userEmployee : ${page.content}">
+						<td>
+							<div class="checkbox  aw-checkbox-no-margin" th:if="${#authentication.principal.userEmployee.code != userEmployee.code}">
+	            				<input type="checkbox" class="js-selection" data:code="${userEmployee.code}">
+	            				<label></label>
+	            			</div>
+						</td>
+						<td th:text="${userEmployee.name}"></td>
+						<td th:text="${userEmployee.email}"></td>
+						<td>
+							<span th:each="groupEmployee : ${userEmployee.groups}" th:text="|${groupEmployee.name}${groupStat.last ? '' : ', '}|"></span>
+						</td>
+						<td>
+							<th:block th:if="${userEmployee.active}">
+								<span class="label  label-success">Ativo</span>
+							</th:block>
+							<th:block th:if="${not userEmployee.active}">
+								<span class="label  label-danger">Inativo</span>
+							</th:block>
+						</td>
+	                 	<td class="text-center">
+							<a class="btn  btn-link  btn-xs" title="Editar" th:href="@{/userEmployees/{code}(code=${userEmployee.code})}"> 
+								<i class="glyphicon glyphicon-pencil"></i>
+							</a>
+							<a class="btn  btn-link  btn-xs" title="Excluir">
+								<i class="glyphicon glyphicon-remove"></i>
+							</a>
+						</td>
+	                </tr>
+	                
+	                <tr th:if="${page.isEmpty}">
+	                	<td colspan="6">Nenhum usu&aacute;rio encontrado</td>
+	                </tr>
+	             </tbody>
+         	</table>
+    	 </div>
+    	 
+    	 <shopbeer:pagination page="${page}"/>
+	</div>
+</section>
+<th:block layout:fragment="javascript-extra">
+	<script th:src="@{/javascripts/multiselection.js}"></script>
+</th:block>
+</body>
+</html>

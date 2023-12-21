@@ -17,7 +17,7 @@ public class SaleListener {
 
     @EventListener
     public void vendaEmitida(SaleEvent saleEvent) {
-        for (ItemSale item : saleEvent.getSale().getItens()) {
+        for (ItemSale item : saleEvent.sale().getItens()) {
             Beer beer = beerRepository.getReferenceById(item.getBeer().getCode());
             beer.setQuantityStock(beer.getQuantityStock() - item.getQuantity());
             beerRepository.save(beer);

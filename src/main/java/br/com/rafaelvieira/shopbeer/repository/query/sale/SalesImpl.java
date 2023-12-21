@@ -14,6 +14,7 @@ import jakarta.persistence.criteria.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
@@ -23,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+@Component
 public class SalesImpl implements SalesQuery {
 
 	@PersistenceContext
@@ -178,7 +180,7 @@ public class SalesImpl implements SalesQuery {
 			}
 
 			if (!StringUtils.hasText(filter.getCpforCnpjCostumer())) {
-				predicates.add(builder.equal(root.get("costumer.cpfOrCnpj"), TypePerson.removeformatting(filter.getCpforCnpjCostumer())));
+				predicates.add(builder.equal(root.get("costumer.cpfOrCnpj"), TypePerson.removeFormatting(filter.getCpforCnpjCostumer())));
 			}
 		}
 

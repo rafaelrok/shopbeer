@@ -15,6 +15,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.query.QueryUtils;
+import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
@@ -22,15 +23,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 
+@Component
 public class CitiesImpl implements CitiesQuery {
 
 	@PersistenceContext
 	private EntityManager manager;
 
-	private final PaginationUtil paginacaoUtil;
+	private final PaginationUtil paginationUtil;
 
-	public CitiesImpl(PaginationUtil paginacaoUtil) {
-		this.paginacaoUtil = paginacaoUtil;
+	public CitiesImpl(PaginationUtil paginationUtil) {
+		this.paginationUtil = paginationUtil;
 	}
 
 	@Override
@@ -46,7 +48,7 @@ public class CitiesImpl implements CitiesQuery {
 		// Add ordering and pagination
 		cq.orderBy(QueryUtils.toOrders(pageable.getSort(), city, cb));
 		TypedQuery<City> query = manager.createQuery(cq);
-		paginacaoUtil.prepare(cb, pageable);
+		paginationUtil.prepare(cb, pageable);
 
 		return new PageImpl<>(query.getResultList(), pageable, total(filtro));
 	}

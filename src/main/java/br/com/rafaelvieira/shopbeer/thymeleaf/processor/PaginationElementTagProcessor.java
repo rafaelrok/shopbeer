@@ -28,7 +28,7 @@ public class PaginationElementTagProcessor extends AbstractElementTagProcessor {
 		IModel model = modelFactory.createModel();
 		model.add(modelFactory.createStandaloneElementTag("th:block"
 				, "th:replace"
-				, String.format("fragments/Paginacao :: pagination (%s)", page.getValue())));
+				, String.format("fragments/Pagination :: pagination (%s)", page.getValue())));
 		
 		structureHandler.replaceWith(model, true);
 	}

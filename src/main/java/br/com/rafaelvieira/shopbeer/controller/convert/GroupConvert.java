@@ -1,19 +1,19 @@
 package br.com.rafaelvieira.shopbeer.controller.convert;
 
-import br.com.rafaelvieira.shopbeer.domain.Group;
+import br.com.rafaelvieira.shopbeer.domain.GroupEmployee;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 import org.thymeleaf.util.StringUtils;
 
 @Component
-public class GroupConvert implements Converter<String, Group> {
+public class GroupConvert implements Converter<String, GroupEmployee> {
 
 	@Override
-	public Group convert(String code) {
+	public GroupEmployee convert(String code) {
 		if (!StringUtils.isEmpty(code)) {
-			Group group = new Group();
-			group.setCode(Long.valueOf(code));
-			return group;
+			GroupEmployee groupEmployee = new GroupEmployee();
+			groupEmployee.setCode(Long.valueOf(code));
+			return groupEmployee;
 		}
 		
 		return null;

@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="pt" xmlns="http://www.w3.org/1999/xhtml" 
+	xmlns:th="http://www.thymeleaf.org">
+	
+<th:block th:fragment="pagetion (page)">
+	<div class="col-sm-12  text-center" th:if="${not page.isEmpty}">
+		<nav>
+			<ul class="pagetion  pagetion-sm" th:with="pageCurrent=${page.current}">
+				<li th:class="${page.first} ? disabled">
+					<a th:href="${page.urlToPage(pageCurrent - 1)}" th:remove="${page.first} ? tag"><span>&laquo;</span></a>
+				</li>
+				<th:block th:each="p : ${#numbers.sequence(1, page.total)}" th:with="numberPage=${p - 1}">
+					<li th:class="${pageCurrent == numberPage} ? active">
+						<a th:href="${page.urlToPage(numberPage)}">[[${p}]]</a>
+					</li>
+				</th:block>
+				
+				<li th:class="${page.last} ? disabled">
+					<a th:href="${page.urlToPage(pageCurrent + 1)}" th:remove="${page.last} ? tag"><span>&raquo;</span></a>
+				</li>
+			</ul>
+		</nav>
+	</div>
+</th:block>
+	
+</html>

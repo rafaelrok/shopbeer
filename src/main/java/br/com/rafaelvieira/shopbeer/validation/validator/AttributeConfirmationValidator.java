@@ -27,7 +27,7 @@ public class AttributeConfirmationValidator implements ConstraintValidator<Attri
 			
 			valid = bothAreNull(valueAttribute, valueAttributeConfirmation) || bothAreEqual(valueAttribute, valueAttributeConfirmation);
 		} catch (Exception e) {
-			throw new RuntimeException("Erro recuperando valores dos atributos", e);
+			throw new RuntimeException("Error retrieving attribute values", e);
 		}
 		
 		if (!valid) {

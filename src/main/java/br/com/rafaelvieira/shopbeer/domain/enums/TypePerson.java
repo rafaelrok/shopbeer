@@ -7,17 +7,17 @@ import lombok.Getter;
 @Getter
 public enum TypePerson {
 
-	PHYSICALPERSON("Physical Person", "CPF", "000.000.000-00", CpfGroup.class) {
+	PHYSICAL_PERSON("Physical Person", "CPF", "000.000.000-00", CpfGroup.class) {
 		@Override
-		public String formatar(String cpfOuCnpj) {
-			return cpfOuCnpj.replaceAll("(\\d{3})(\\d{3})(\\d{3})", "$1.$2.$3-");
+		public String format(String cpfOrCnpj) {
+			return cpfOrCnpj.replaceAll("(\\d{3})(\\d{3})(\\d{3})", "$1.$2.$3-");
 		}
 	},
 
-	LEGALPERSON("Legal Person", "CNPJ", "00.000.000/0000-00", CnpjGroup.class) {
+	LEGAL_PERSON("Legal Person", "CNPJ", "00.000.000/0000-00", CnpjGroup.class) {
 		@Override
-		public String formatar(String cpfOuCnpj) {
-			return cpfOuCnpj.replaceAll("(\\d{2})(\\d{3})(\\d{3})(\\d{4})", "$1.$2.$3/$4-");
+		public String format(String cpfOrCnpj) {
+			return cpfOrCnpj.replaceAll("(\\d{2})(\\d{3})(\\d{3})(\\d{4})", "$1.$2.$3/$4-");
 		}
 	};
 
@@ -32,11 +32,10 @@ public enum TypePerson {
 		this.mask = mask;
 		this.group = group;
 	}
-
-	public abstract String formatar(String cpfOuCnpj);
 	
-	public static String removeformatting(String cpfOuCnpj) {
+	public static String removeFormatting(String cpfOuCnpj) {
 		return cpfOuCnpj.replaceAll("\\.|-|/", "");
 	}
 
+	public abstract String format(String cpfOrCnpj);
 }

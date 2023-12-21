@@ -30,13 +30,13 @@ public class ReportService {
     public byte[] generateIssuedSalesReport(ReportingPeriodDTO reportingPeriodDTO) throws Exception {
         Date startDate = Date.from(LocalDateTime.of(reportingPeriodDTO.getStartDate(), LocalTime.of(0, 0, 0))
                 .atZone(ZoneId.systemDefault()).toInstant());
-        Date enddate = Date.from(LocalDateTime.of(reportingPeriodDTO.getEndDate(), LocalTime.of(23, 59, 59))
+        Date endDate = Date.from(LocalDateTime.of(reportingPeriodDTO.getEndDate(), LocalTime.of(23, 59, 59))
                 .atZone(ZoneId.systemDefault()).toInstant());
 
         Map<String, Object> parametros = new HashMap<>();
         parametros.put("format", "pdf");
         parametros.put("start_date", startDate);
-        parametros.put("end_date", enddate);
+        parametros.put("end_date", endDate);
 
         InputStream inputStream = this.getClass()
                 .getResourceAsStream("/reports/relatorio_vendas_emitidas.jasper");

@@ -24,7 +24,7 @@ public class UserEmployeeService {
     }
 
     @Transactional
-    public void save(UserEmployee userEmployee) {
+    public void insert(UserEmployee userEmployee) {
         Optional<UserEmployee> existingUser = userEmployeeRepository.findByEmail(userEmployee.getEmail());
         if (existingUser.isPresent() && !existingUser.get().equals(userEmployee)) {
             throw new EmailUserAlreadyRegisteredException("E-mail already registered");

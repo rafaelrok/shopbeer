@@ -1,6 +1,8 @@
-package com.algaworks.brewer.controller;
+package br.com.rafaelvieira.shopbeer.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import br.com.rafaelvieira.shopbeer.domain.dto.PhotoDTO;
+import br.com.rafaelvieira.shopbeer.storage.PhotoStorage;
+import br.com.rafaelvieira.shopbeer.storage.PhotoStorageRunnable;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -10,30 +12,29 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.async.DeferredResult;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.algaworks.brewer.dto.FotoDTO;
-import com.algaworks.brewer.storage.FotoStorage;
-import com.algaworks.brewer.storage.FotoStorageRunnable;
-
 @RestController
-@RequestMapping("/fotos")
+@RequestMapping("/photos")
 public class PhotoController {
 
-	@Autowired
-	private FotoStorage fotoStorage;
-	
-	@PostMapping
-	public DeferredResult<FotoDTO> upload(@RequestParam("files[]") MultipartFile[] files) {
-		DeferredResult<FotoDTO> resultado = new DeferredResult<>();
+	private final PhotoStorage photoStorage;
 
-		Thread thread = new Thread(new FotoStorageRunnable(files, resultado, fotoStorage));
+    public PhotoController(PhotoStorage photoStorage) {
+        this.photoStorage = photoStorage;
+    }
+
+    @PostMapping
+	public DeferredResult<PhotoDTO> upload(@RequestParam("files[]") MultipartFile[] files) {
+		DeferredResult<PhotoDTO> result = new DeferredResult<>();
+
+		Thread thread = new Thread(new PhotoStorageRunnable(files, result, photoStorage));
 		thread.start();
 		
-		return resultado;
+		return result;
 	}
 	
-	@GetMapping("/{nome:.*}")
-	public byte[] recuperar(@PathVariable String nome) {
-		return fotoStorage.recuperar(nome);
+	@GetMapping("/{name:.*}")
+	public byte[] recover(@PathVariable String name) {
+		return photoStorage.recover(name);
 	}
 	
 }

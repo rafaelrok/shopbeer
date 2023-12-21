@@ -43,9 +43,9 @@ public class Costumer implements Serializable {
 	@CPF(groups = CpfGroup.class)
 	@CNPJ(groups = CnpjGroup.class)
 	@Column(name = "cpf_cnpj")
-	private String cpfOrCnpj;
+	private String cpfcnpj;
 
-	private String telefone;
+	private String telephone;
 
 	@Email(message = "E-mail invalid")
 	@Column(unique = true)
@@ -57,16 +57,16 @@ public class Costumer implements Serializable {
 	
 	@PrePersist @PreUpdate
 	private void prePersistPreUpdate() {
-		this.cpfOrCnpj = TypePerson.removeformatting(this.cpfOrCnpj);
+		this.cpfcnpj = TypePerson.removeFormatting(this.cpfcnpj);
 	}
 	
 	@PostLoad
 	private void postLoad() {
-		this.cpfOrCnpj = this.typePerson.formatar(this.cpfOrCnpj);
+		this.cpfcnpj = this.typePerson.format(this.cpfcnpj);
 	}
 	
 	public String getCpfOrCnpjNoFormatting() {
-		return TypePerson.removeformatting(this.cpfOrCnpj);
+		return TypePerson.removeFormatting(this.cpfcnpj);
 	}
 
 	@Override

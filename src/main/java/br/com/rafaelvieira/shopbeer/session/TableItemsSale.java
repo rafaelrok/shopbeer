@@ -47,10 +47,10 @@ public class TableItemsSale {
     }
 
     public void deleteItem(Beer beer) {
-        int indice = IntStream.range(0, itens.size())
+        int index = IntStream.range(0, itens.size())
                 .filter(i -> itens.get(i).getBeer().equals(beer))
                 .findAny().getAsInt();
-        itens.remove(indice);
+        itens.remove(index);
     }
 
     public int total() {

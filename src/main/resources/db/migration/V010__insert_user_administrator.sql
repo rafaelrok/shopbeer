@@ -1,0 +1,1 @@
+INSERT INTO user_employee (name, email, password, active) VALUES ('Admin', 'admin@shopbeer.com', '$2a$10$g.wT4R0Wnfel1jc/k84OXuwZE02BlACSLfWy6TycGPvvEKvIm86SG', 1)

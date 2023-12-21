@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import br.com.rafaelvieira.shopbeer.domain.Group;
+import br.com.rafaelvieira.shopbeer.domain.GroupEmployee;
 import br.com.rafaelvieira.shopbeer.domain.UserGroup;
 import br.com.rafaelvieira.shopbeer.repository.filter.UserEmployeeFilter;
 import br.com.rafaelvieira.shopbeer.repository.pagination.PaginationUtil;
@@ -15,6 +15,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import br.com.rafaelvieira.shopbeer.domain.UserEmployee;
@@ -22,6 +23,7 @@ import br.com.rafaelvieira.shopbeer.domain.UserEmployee;
 import org.springframework.util.StringUtils;
 
 
+@Component
 public class UserEmployeeImpl implements UserEmployeesQuery {
 
 	@PersistenceContext
@@ -46,7 +48,7 @@ public class UserEmployeeImpl implements UserEmployeesQuery {
 	@Override
 	public List<String> permissions(UserEmployee userEmployee) {
 		return manager.createQuery(
-				"select distinct p.name from UserEmployee u inner join u.groups g inner join g.permissions p where u = :userEmployee", String.class)
+				"select distinct p.name from UserEmployee u inner join u.groupEmployees g inner join g.permissions p where u = :userEmployee", String.class)
 				.setParameter("userEmployee", userEmployee)
 				.getResultList();
 	}
@@ -96,7 +98,7 @@ public class UserEmployeeImpl implements UserEmployeesQuery {
 //		adicionarFiltro(filter, criteria);
 //
 //		List<UserEmployee> filtered = criteria.list();
-//		filtered.forEach(u -> Hibernate.initialize(u.getGroups()));
+//		filtered.forEach(u -> Hibernate.initialize(u.getGroupEmployees()));
 //		return new PageImpl<>(filtered, pageable, total(filter));
 //	}
 
@@ -159,8 +161,8 @@ public class UserEmployeeImpl implements UserEmployeesQuery {
 				predicates.add(cb.like(root.get("email"), filter.getEmail() + "%"));
 			}
 
-			if (filter.getGroups() != null && !filter.getGroups().isEmpty()) {
-				for (Long codigoGrupo : filter.getGroups().stream().mapToLong(Group::getCode).toArray()) {
+			if (filter.getGroupEmployees() != null && !filter.getGroupEmployees().isEmpty()) {
+				for (Long codigoGrupo : filter.getGroupEmployees().stream().mapToLong(GroupEmployee::getCode).toArray()) {
 					Subquery<Long> subquery = cq.subquery(Long.class);
 					Root<UserGroup> subRoot = subquery.from(UserGroup.class);
 					subquery.select(subRoot.get("id").get("userEmployee"));
@@ -185,9 +187,9 @@ public class UserEmployeeImpl implements UserEmployeesQuery {
 //				criteria.add(Restrictions.ilike("email", filtro.getEmail(), MatchMode.START));
 //			}
 //
-//			if (filtro.getGroups() != null && !filtro.getGroups().isEmpty()) {
+//			if (filtro.getGroupEmployees() != null && !filtro.getGroupEmployees().isEmpty()) {
 //				List<Criterion> subqueries = new ArrayList<>();
-//				for (Long codigoGrupo : filtro.getGroups().stream().mapToLong(Group::getCode).toArray()) {
+//				for (Long codigoGrupo : filtro.getGroupEmployees().stream().mapToLong(GroupEmployee::getCode).toArray()) {
 //					DetachedCriteria dc = DetachedCriteria.forClass(UserGroup.class);
 //					dc.add(Restrictions.eq("id.grupo.codigo", codigoGrupo));
 //					dc.setProjection(Projections.property("id.userEmployee"));

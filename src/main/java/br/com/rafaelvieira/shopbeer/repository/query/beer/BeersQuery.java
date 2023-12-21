@@ -15,6 +15,6 @@ public interface BeersQuery {
 	
 	List<BeerDTO> bySkuOrName(String skuOrName);
 	
-	public StockItemValue stockItemValue();
+	StockItemValue stockItemValue();
 	
 }

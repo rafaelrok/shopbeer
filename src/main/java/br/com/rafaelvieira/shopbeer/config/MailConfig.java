@@ -1,13 +1,14 @@
 package br.com.rafaelvieira.shopbeer.config;
 
-import java.util.Properties;
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
+
+import java.util.Properties;
+
 
 @Configuration
 @PropertySource(value = { "file://${HOME}/.shopbeer-mail.properties" }, ignoreResourceNotFound = true)
@@ -32,7 +33,7 @@ public class MailConfig {
 		props.put("mail.smtp.auth", true);
 		props.put("mail.smtp.starttls.enable", true);
 		props.put("mail.debug", false);
-		props.put("mail.smtp.connectiontimeout", 10000); // miliseconds
+		props.put("mail.smtp.connectiontimeout", 10000);
 
 		mailSender.setJavaMailProperties(props);
 		

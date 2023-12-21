@@ -6,6 +6,7 @@ import br.com.rafaelvieira.shopbeer.domain.enums.StatusUserEmployee;
 import br.com.rafaelvieira.shopbeer.repository.GroupsRepository;
 import br.com.rafaelvieira.shopbeer.repository.UserEmployeeRepository;
 import br.com.rafaelvieira.shopbeer.repository.filter.UserEmployeeFilter;
+import br.com.rafaelvieira.shopbeer.repository.query.userEmployee.UserEmployeesQuery;
 import br.com.rafaelvieira.shopbeer.service.UserEmployeeService;
 import br.com.rafaelvieira.shopbeer.service.exception.EmailUserAlreadyRegisteredException;
 import br.com.rafaelvieira.shopbeer.service.exception.PasswordRequiredUserException;
@@ -33,29 +34,29 @@ public class UserEmployeeController {
 
     private final UserEmployeeService userEmployeeService;
     private final GroupsRepository groupRepository;
-    private final UserEmployeeRepository userEmployeeRepository;
+    private final UserEmployeesQuery userEmployeesQuery;
 
-    public UserEmployeeController(UserEmployeeService userEmployeeService, GroupsRepository groupRepository, UserEmployeeRepository userEmployeeRepository) {
+    public UserEmployeeController(UserEmployeeService userEmployeeService, GroupsRepository groupRepository, UserEmployeesQuery userEmployeesQuery) {
         this.userEmployeeService = userEmployeeService;
         this.groupRepository = groupRepository;
-        this.userEmployeeRepository = userEmployeeRepository;
+        this.userEmployeesQuery = userEmployeesQuery;
     }
 
     @RequestMapping("/new")
     public ModelAndView newUserEmployee(UserEmployee userEmployee) {
-        ModelAndView mv = new ModelAndView("user/RegisterUser");
-        mv.addObject("grups", groupRepository.findAll());
+        ModelAndView mv = new ModelAndView("user/register-user");
+        mv.addObject("groupsEmployee", groupRepository.findAll());
         return mv;
     }
 
-    @PostMapping({ "/new", "{\\+d}" })
-    public ModelAndView save(@Valid UserEmployee userEmployee, BindingResult result, RedirectAttributes attributes) {
+    @PostMapping({ "/new", "/{d}" })
+    public ModelAndView save(@Valid @PathVariable("d") UserEmployee userEmployee, BindingResult result, RedirectAttributes attributes) {
         if (result.hasErrors()) {
             return newUserEmployee(userEmployee);
         }
 
         try {
-            userEmployeeService.save(userEmployee);
+            userEmployeeService.insert(userEmployee);
         } catch (EmailUserAlreadyRegisteredException e) {
             result.rejectValue("email", e.getMessage(), e.getMessage());
             return newUserEmployee(userEmployee);
@@ -71,10 +72,10 @@ public class UserEmployeeController {
     @GetMapping
     public ModelAndView search(UserEmployeeFilter userEmployeeFilter
             , @PageableDefault(size = 3) Pageable pageable, HttpServletRequest httpServletRequest) {
-        ModelAndView mv = new ModelAndView("user/SearchUser");
+        ModelAndView mv = new ModelAndView("user/search-user");
         mv.addObject("groups", groupRepository.findAll());
 
-        PageWrapper<UserEmployee> pageWrapper = new PageWrapper<>(userEmployeeRepository.filtered(userEmployeeFilter, pageable)
+        PageWrapper<UserEmployee> pageWrapper = new PageWrapper<>(userEmployeesQuery.filtered(userEmployeeFilter, pageable)
                 , httpServletRequest);
         mv.addObject("page", pageWrapper);
         return mv;
@@ -88,7 +89,7 @@ public class UserEmployeeController {
 
     @GetMapping("/{code}")
     public ModelAndView edit(@PathVariable Long code) {
-        UserEmployee userEmployee = userEmployeeRepository.searchWithGroups(code);
+        UserEmployee userEmployee = userEmployeesQuery.searchWithGroups(code);
         ModelAndView mv = newUserEmployee(userEmployee);
         mv.addObject(userEmployee);
         return mv;

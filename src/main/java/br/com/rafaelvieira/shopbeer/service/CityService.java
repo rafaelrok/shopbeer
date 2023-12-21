@@ -1,4 +1,5 @@
 package br.com.rafaelvieira.shopbeer.service;
+
 import java.util.Optional;
 
 import br.com.rafaelvieira.shopbeer.domain.City;

@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="pt" xmlns="http://www.w3.org/1999/xhtml" 
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/LayoutDefault}"
+	  xmlns:shopbeer="http://shopbeer.rafaelvieira.com.br"
+	xmlns:data="http://www.thymeleaf.org/extras/data">
+	
+<head>
+	<title>Pesquisa de vendas</title>
+</head>
+
+<body>
+<section layout:fragment="conteudo">
+	<div class="page-header">
+		<div class="container-fluid">
+			<div class="row">
+				<div class="col-xs-10">
+					<h1>Pesquisa de vendas</h1>
+				</div>
+				
+				<div class="col-xs-2">
+					<div class="aw-page-header-controls">
+						<a class="btn  btn-default" th:href="@{/sales/new}">
+							<i class="glyphicon  glyphicon-plus-sign"></i> <span class="hidden-xs  hidden-sm">Nova venda</span>
+						</a>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	<div class="container-fluid">
+		<form method="GET" th:object="${saleFilter}" th:action="@{/sales}">
+			<div class="row">
+				<div class="form-groupEmployee  col-sm-6">
+					<label class="control-label" for="code">C&oacute;digo</label>
+					<input type="text" class="form-control" id="code" autofocus="autofocus" th:field="*{code}"/>
+				</div>
+				
+				<div class="form-groupEmployee  col-sm-6">
+					<label for="status" class="control-label">Status</label>
+					<select id="status" class="form-control" th:field="*{status}">
+	                    <option value="">Todos os status</option>
+	                    <option th:each="status : ${allStatus}" th:value="${status}" th:text="${status.description}"></option>
+	                </select>
+				</div>
+			</div>
+			
+			<div class="row">
+				<div class="form-groupEmployee  col-sm-6">
+					<label for="initialCreationDate">Data de cria&ccedil;o</label>
+					<div class="form-inline">
+						<input type="text" class="form-control  aw-form-control-inline-sm  js-date" id="initialCreationDate"
+							th:field="*{since}" autocomplete="off"/>
+						<label for="finalCreateDate" class="aw-form-label-between">at&eacute;</label>
+						<input type="text" class="form-control  aw-form-control-inline-sm  js-date" id="finalCreateDate"
+							th:field="*{until}" autocomplete="off"/>
+					</div>
+				</div>
+				
+				<div class="form-groupEmployee  col-sm-6">
+					<label for="minimumValue">Valor total</label>
+					<div class="form-inline">
+						<input type="text" class="form-control  aw-form-control-inline-sm  js-decimal" id="minimumValue" th:field="*{minimumValue}"/>
+						<label for="maximumValue" class="aw-form-label-between">at&eacute;</label>
+						<input type="text" class="form-control  aw-form-control-inline-sm  js-decimal" id="maximumValue" th:field="*{maximumValue}"/>
+					</div>
+				</div>
+			</div>
+			
+			<div class="row">
+				<div class="form-groupEmployee  col-sm-6">
+					<label class="control-label" for="nameCostumer">Nome cliente</label>
+					<input type="text" class="form-control" id="nameCostumer" th:field="*{nameCostumer}"/>
+				</div>
+			
+				<div class="form-groupEmployee  col-sm-6">
+					<label for="cpfOrCnpj" class="control-label">CPF/CNPJ</label>
+					<input type="text" class="form-control" id="cpfOrCnpj" th:field="*{cpfOrCnpjCostumer}"/>
+				</div>
+				
+			</div>
+			
+			<button type="submit" class="btn  btn-primary">Pesquisar</button>
+		</form>
+		
+		<div class="table-responsive  bw-tabela-simples">
+			<table class="table  table-hover">
+	            <thead>
+	            	<tr>
+	                	<th>C&oacute;digo</th>
+	                	<th>
+	                		<shopbeer:order page="${page}" field="c.name" text="Cliente"/>
+	                	</th>
+	                	<th>Data de cria&ccedil;o</th>
+	                	<th>Valor total</th>
+	                	<th>Vendedor</th>
+	                	<th>Status</th>
+	                 	<th class="table-col-acoes"></th>
+					</tr>
+				</thead>
+				
+	            <tbody>
+					<tr th:each="venda : ${page.content}">
+						<td th:text="${sale.code}"></td>
+						<td th:text="${sale.costumer.name}"></td>
+						<td th:text="${{sale.createDate}}"></td>
+						<td th:text="|R$ ${{sale.amount}}|"></td>
+						<td th:text="${sale.userEmployee.name}"></td>
+						<td th:text="${sale.status.description}"></td>
+	                 	<td class="text-center">
+		   					<a class="btn  btn-link  btn-xs  js-tooltip" title="Editar" 
+		   							th:href="@{/sales/{code}(code=${sale.code})}">
+		   						<i class="glyphicon glyphicon-pencil"></i>
+		   					</a>
+	                 	</td>
+	                </tr>
+	                
+	                <tr th:if="${page.isEmpty}">
+	                	<td colspan="7">Nenhuma venda encontrada</td>
+	                </tr>
+	             </tbody>
+	         </table>
+		</div>
+		
+		<shopbeer:pagination page="${page}"/>
+	</div>
+</section>
+
+</body>
+</html>

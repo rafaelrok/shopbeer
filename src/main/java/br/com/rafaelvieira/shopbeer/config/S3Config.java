@@ -1,5 +1,8 @@
 package br.com.rafaelvieira.shopbeer.config;
 
+import com.amazonaws.auth.AWSStaticCredentialsProvider;
+import com.amazonaws.services.s3.AmazonS3ClientBuilder;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -16,25 +19,37 @@ import com.amazonaws.services.s3.AmazonS3Client;
 
 import java.util.Objects;
 
-@Profile("prod")
+//@Profile("dev")
 @Configuration
 @PropertySource(value = { "file://${HOME}/.shopbeer-s3.properties" }, ignoreResourceNotFound = true)
 public class S3Config {
 
-	private final Environment env;
+	@Value("${aws_access_key_id}")
+	private String awsKeyId;
 
-	public S3Config(Environment env) {
-		this.env = env;
-	}
+	@Value("${aws_access_secret_key}")
+	private String awsSecretKey;
+
+	@Value("${aws_region}")
+	private String awsRegion;
 
 	@Bean
 	public AmazonS3 amazonS3() {
 		AWSCredentials credenciais = new BasicAWSCredentials(
-				Objects.requireNonNull(env.getProperty("AWS_ACCESS_KEY_ID")), Objects.requireNonNull(env.getProperty("AWS_SECRET_ACCESS_KEY")));
+				Objects.requireNonNull(awsKeyId), Objects.requireNonNull(awsSecretKey));
 		AmazonS3 amazonS3 = new AmazonS3Client(credenciais, new ClientConfiguration());
-		Region regiao = Region.getRegion(Regions.US_WEST_2);
-		amazonS3.setRegion(regiao);
+		Region region = Region.getRegion(Regions.US_WEST_1);
+		amazonS3.setRegion(region);
 		return amazonS3;
 	}
+
+//	@Bean
+//	public AmazonS3 s3client() {
+//		BasicAWSCredentials awsCred = new BasicAWSCredentials(awsKeyId, awsSecretKey);
+//		return AmazonS3ClientBuilder.standard()
+//				.withRegion(Regions.fromName(awsRegion))
+//				.withCredentials(new AWSStaticCredentialsProvider(awsCred))
+//				.build();
+//	}
 	
 }

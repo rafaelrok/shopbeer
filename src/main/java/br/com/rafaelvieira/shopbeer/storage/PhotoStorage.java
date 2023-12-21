@@ -1,8 +1,10 @@
 package br.com.rafaelvieira.shopbeer.storage;
 
+import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 import java.util.UUID;
 
+@Component
 public interface PhotoStorage {
 
     public final String THUMBNAIL_PREFIX = "thumbnail.";

@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	xmlns:th="http://www.thymeleaf.org"
+	layout:decorate="~{layout/LayoutDefault}"
+	  xmlns:shopbeer="http://shopbeer.rafaelvieira.com.br">
+
+<head>
+	<title>Cadastro de usuário</title>
+	
+	<link rel="stylesheet" type="text/css" th:href="@{/stylesheets/vendors/bootstrap-switch.min.css}"/>
+</head>
+
+<section layout:fragment="conteudo">
+
+	<div class="page-header">
+		<div class="container-fluid">
+			<div class="row">
+				<div class="col-xs-10">
+					<h1 th:if="${userEmployee.new}">Cadastro de usu&aacute;rio</h1>
+					<h1 th:unless="${userEmployee.new}">Edi&ccedil;&atilde;o de usu&aacute;rio - [[${userEmployee.name}]]</h1>
+				</div>
+				
+				<div class="col-xs-2">
+					<div class="aw-page-header-controls">
+						<a class="btn  btn-default" th:href="@{/userEmployees}">
+							<i class="glyphicon  glyphicon-plus-sign"></i> <span class="hidden-xs  hidden-sm">Pesquisa</span>
+						</a>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	<div class="container-fluid">
+		<form method="POST" th:object="${userEmployee}" 
+				th:action="${userEmployee.new} ? @{/userEmployees/new} : @{/userEmployees/{code}(code=${userEmployee.code})}">
+			<shopbeer:message/>
+			
+			<input type="hidden" th:field="*{code}"/>
+			
+			<div class="row">
+				<div class="form-groupEmployee  col-sm-12  bw-required" shopbeer:classforerror="name">
+					<label for="name" class="control-label">Nome</label>
+					<input type="text" class="form-control" id="name" autofocus="autofocus" th:field="*{name}"/>
+				</div>
+			</div>
+				
+			<div class="row">
+				<div class="form-groupEmployee  col-sm-6  bw-required" shopbeer:classforerror="email">
+					<label for="email" class="control-label">E-mail</label>
+					<input type="text" class="form-control" id="email" th:field="*{email}"/>
+				</div>
+				
+				<div class="form-groupEmployee  col-sm-3">
+					<label for="birthDate" class="control-label">Data de nascimento</label>
+					<input type="text" class="form-control  js-date" id="birthDate" th:field="*{birthDate}" autocomplete="off"/>
+				</div>
+			</div>
+			
+			<div class="row">
+				<div class="form-groupEmployee  col-sm-3" shopbeer:classforerror="password" th:classappend="${userEmployee.new} ? bw-required">
+					<label for="password" class="control-label">Senha</label> 
+					<input type="password" class="form-control" id="password" th:field="*{password}"/>
+				</div>
+				
+				<div class="form-groupEmployee  col-sm-3" shopbeer:classforerror="confirmPassword">
+					<label for="confirmPassword" class="control-label">Confirmação de password</label> 
+					<input type="password" class="form-control" id="confirmPassword" th:field="*{confirmPassword}"/>
+				</div>
+				
+				<div class="form-groupEmployee  col-sm-3" th:if="${#authentication.principal.userEmployee.code != userEmployee.code}">
+					<label class="control-label">Status</label>
+					<div>
+						<input type="checkbox" class="js-status" data-size="small" data-off-color="danger" 
+							data-on-text="active" data-off-text="Inactive" th:field="*{active}"/>
+					</div>
+				</div>
+				
+			</div>
+			
+			<div class="row">
+				<div class="form-groupEmployee  col-sm-6  bw-required" shopbeer:classforerror="groups">
+					<label class="control-label">Grupos</label> 
+					<div>
+						<th:block th:each="groupEmployee : ${groups}">
+	  						<div class="checkbox  checkbox-inline"> 
+		    					<input type="checkbox" th:value="${groupEmployee.code}" th:field="*{groups}"/>
+		    					<label th:for="${#ids.prev('groups')}" th:text="${groupEmployee.name}">Administrador</label>
+	    					</div>
+	    				</th:block>
+					</div>
+				</div>
+			</div>
+			
+			<button type="submit" class="btn  btn-primary">Salvar</button>
+		</form>
+	</div>
+</section>
+
+<th:block layout:fragment="javascript-extra">
+	<script th:src="@{/javascripts/vendors/bootstrap-switch.min.js}"></script>
+	<script>
+		$('.js-status').bootstrapSwitch();
+	</script>
+</th:block>
+</html>

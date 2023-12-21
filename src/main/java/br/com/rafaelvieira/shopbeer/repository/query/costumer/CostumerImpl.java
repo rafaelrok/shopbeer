@@ -13,19 +13,21 @@ import jakarta.persistence.criteria.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 
-public class CostumerImpl implements CostumerQueries {
+@Component
+public class CostumerImpl implements CostumerQuery {
 
 	@PersistenceContext
 	private EntityManager manager;
 
-	private final PaginationUtil paginacaoUtil;
+	private final PaginationUtil PaginationUtil;
 
-	public CostumerImpl(PaginationUtil paginacaoUtil) {
-		this.paginacaoUtil = paginacaoUtil;
+	public CostumerImpl(PaginationUtil PaginationUtil) {
+		this.PaginationUtil = PaginationUtil;
 	}
 
 	@Override
@@ -46,7 +48,7 @@ public class CostumerImpl implements CostumerQueries {
 		TypedQuery<Costumer> query = manager.createQuery(cq);
 
 		// Apply pagination
-		paginacaoUtil.prepare(cb, pageable);
+		PaginationUtil.prepare(cb, pageable);
 
 		return new PageImpl<>(query.getResultList(), pageable, total(costumerFilter));
 	}

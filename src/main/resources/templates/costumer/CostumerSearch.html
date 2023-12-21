@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="pt" xmlns="http://www.w3.org/1999/xhtml" 
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/LayoutDefault}"
+	  xmlns:shopbeer="http://shopbeer.rafaelvieira.com.br"
+	xmlns:data="http://www.thymeleaf.org/extras/data">
+	
+<head>
+	<title>Pesquisa de costumers</title>
+</head>
+
+<body>
+<section layout:fragment="conteudo">
+	<div class="page-header">
+		<div class="container-fluid">
+			<div class="row">
+				<div class="col-xs-10">
+					<h1>Pesquisa de costumers</h1>
+				</div>
+				
+				<div class="col-xs-2">
+					<div class="aw-page-header-controls">
+						<a class="btn  btn-default" th:href="@{/costumers/new}">
+							<i class="glyphicon  glyphicon-plus-sign"></i> <span class="hidden-xs  hidden-sm">Novo costumer</span>
+						</a>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	<div class="container-fluid">
+		<form method="GET" th:object="${costumerFilter}">
+			<div class="row">
+				<div class="form-groupEmployee  col-sm-8">
+					<label class="control-label" for="name">Nome</label>
+					<input type="text" class="form-control" id="name" autofocus="autofocus" th:field="*{name}"/>
+				</div>
+				
+				<div class="form-groupEmployee  col-sm-4">
+					<label for="cpfOrCnpj" class="control-label">CPF/CNPJ</label>
+					<input type="text" class="form-control" id="cpfOrCnpj" th:field="*{cpfOrCnpj}"/>
+				</div>
+			</div>
+			
+			<button type="submit" class="btn  btn-primary">Pesquisar</button>
+		</form>
+		
+		<div class="table-responsive  bw-tabela-simples">
+			<table class="table  table-hover">
+				<thead>
+					<tr>
+						<th class="table-costumers-col-nome">
+							<shopbeer:order page="${page}" field="name" text="Nome"/>
+						</th>
+						<th class="table-costumers-col-tipo-pessoa">
+							<shopbeer:order page="${page}" field="typePerson" text="Tipo Pessoa"/>
+						</th>
+						<th class="table-costumers-col-cpf-cnpj">CPF/CNPJ</th>
+						<th class="table-costumers-col-telefone">Telefone</th>
+						<th class="table-costumers-col-cidade-estado">Cidade/Estado</th>
+						<th class="table-col-acoes"></th>
+					</tr>
+				</thead>
+				
+				<tbody>
+					<tr th:each="costumer : ${page.content}">
+						<td th:text="${costumer.name}"></td>
+						<td class="text-center" th:text="${costumer.typePerson.description}">Física</td>
+						<td class="text-right" th:text="${costumer.cpfOrCnpj}">111.111.111-11</td>
+						<td class="text-right" th:text="${costumer.telephone}">(11) 99999-9999</td>
+						<td class="text-right" th:text="${costumer.address.nameCityAcronymState}"></td>
+						<td class="text-center">
+							<a class="btn  btn-link  btn-xs" title="Editar"> 
+								<i class="glyphicon glyphicon-pencil"></i>
+							</a>
+							<a class="btn  btn-link  btn-xs" title="Excluir">
+								<i class="glyphicon glyphicon-remove"></i>
+							</a>
+						</td>
+					</tr>
+					<tr th:if="${page.isEmpty}">
+						<td colspan="5">Nenhum costumer encontrado</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		
+		<shopbeer:pagination page="${page}"/>
+		
+	</div>
+</section>
+</body>
+</html>

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/LayoutDefault}"
+	  xmlns:shopbeer="http://shopbeer.rafaelvieira.com.br">
+
+<head>
+	<title>Cadastro de cidade</title>
+</head>
+
+<section layout:fragment="conteudo">
+
+	<div class="page-header">
+		<div class="container-fluid">
+			<div class="row">
+				<div class="col-xs-10">
+					<h1>Cadastro de cidade</h1>
+				</div>
+				
+				<div class="col-xs-2">
+					<div class="aw-page-header-controls">
+						<a class="btn  btn-default" th:href="@{/cities}">
+							<i class="glyphicon  glyphicon-plus-sign"></i> <span class="hidden-xs  hidden-sm">Pesquisa</span>
+						</a>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	<div class="container-fluid">
+		<form method="POST" th:object="${city}" th:action="@{/cities/new}">
+			<shopbeer:message/>
+			
+			<div class="row">
+				<div class="form-groupEmployee  col-sm-4  bw-required" shopbeer:classforerror="estado">
+					<label for="state" class="control-label">Estado</label>
+					<select id="state" class="form-control" th:field="*{state}">
+	                    <option value="">Selecione o estado</option>
+	                    <option th:each="estado : ${states}" th:value="${state.code}" th:text="${state.name}">São Paulo</option>
+	                </select>
+				</div>
+				
+				<div class="form-groupEmployee  col-sm-8  bw-required" shopbeer:classforerror="nome">
+					<label for="name" class="control-label">Nome</label>
+					<input type="text" class="form-control" id="name" th:field="*{name}"/>
+				</div>
+			</div>
+			
+			<button type="submit" class="btn  btn-primary">Salvar</button>
+		</form>
+	</div>
+</section>
+
+</html>

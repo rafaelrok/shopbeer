@@ -1,91 +1,88 @@
-package com.algaworks.brewer.controller;
+package br.com.rafaelvieira.shopbeer.controller;
 
-import java.util.List;
+import br.com.rafaelvieira.shopbeer.controller.page.PageWrapper;
+import br.com.rafaelvieira.shopbeer.domain.City;
+import br.com.rafaelvieira.shopbeer.repository.CityRepository;
+import br.com.rafaelvieira.shopbeer.repository.StateRepository;
+import br.com.rafaelvieira.shopbeer.repository.filter.CityFilter;
+import br.com.rafaelvieira.shopbeer.repository.query.city.CitiesQuery;
+import br.com.rafaelvieira.shopbeer.service.CityService;
+import br.com.rafaelvieira.shopbeer.service.exception.NameCityAlreadyRegisteredException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.MediaType;
-import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import com.algaworks.brewer.controller.page.PageWrapper;
-import com.algaworks.brewer.model.Cidade;
-import com.algaworks.brewer.repository.Cidades;
-import com.algaworks.brewer.repository.Estados;
-import com.algaworks.brewer.repository.filter.CidadeFilter;
-import com.algaworks.brewer.service.CadastroCidadeService;
-import com.algaworks.brewer.service.exception.NomeCidadeJaCadastradaException;
+import java.util.List;
 
-@Controller
+@RestController
 @RequestMapping("/cidades")
 public class CityController {
 
-	@Autowired
-	private Cidades cidades;
-	
-	@Autowired
-	private Estados estados;
-	
-	@Autowired
-	private CadastroCidadeService cadastroCidadeService;
-	
-	@RequestMapping("/nova")
-	public ModelAndView nova(Cidade cidade) {
-		ModelAndView mv = new ModelAndView("cidade/CadastroCidade");
-		mv.addObject("estados", estados.findAll());
+	private final CityRepository cityRepository;
+	private final StateRepository stateRepository;
+	private final CityService cityService;
+	private final CitiesQuery citiesQuery;
+
+    public CityController(CityRepository cityRepository, StateRepository stateRepository, CityService cityService, CitiesQuery citiesQuery) {
+        this.cityRepository = cityRepository;
+        this.stateRepository = stateRepository;
+        this.cityService = cityService;
+        this.citiesQuery = citiesQuery;
+    }
+
+    @RequestMapping("/new")
+	public ModelAndView newCity(City city) {
+		ModelAndView mv = new ModelAndView("city/register-city");
+		mv.addObject("states", stateRepository.findAll());
 		return mv;
 	}
 	
-	@Cacheable(value = "cidades", key = "#codigoEstado")
+	@Cacheable(value = "cities", key = "#codeState")
 	@RequestMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-	public @ResponseBody List<Cidade> pesquisarPorCodigoEstado(
-			@RequestParam(name = "estado", defaultValue = "-1") Long codigoEstado) {
+	public List<City> searchByStateCode(
+			@RequestParam(name = "state", defaultValue = "-1") Long codeState) {
 		try {
 			Thread.sleep(1000);
 		} catch (InterruptedException e) {	}
-		return cidades.findByEstadoCodigo(codigoEstado);
+		return cityRepository.findByStateCode(codeState);
 	}
 	
-	@PostMapping("/nova")
-	@CacheEvict(value = "cidades", key = "#cidade.estado.codigo", condition = "#cidade.temEstado()")
-	public ModelAndView salvar(@Valid Cidade cidade, BindingResult result, RedirectAttributes attributes) {
+	@PostMapping("/new")
+	@CacheEvict(value = "cities", key = "#city.state.code", condition = "#city.hasState()")
+	public ModelAndView save(@Valid City city, BindingResult result, RedirectAttributes attributes) {
 		if (result.hasErrors()) {
-			return nova(cidade);
+			return newCity(city);
 		}
 		
 		try {
-			cadastroCidadeService.salvar(cidade);
-		} catch (NomeCidadeJaCadastradaException e) {
-			result.rejectValue("nome", e.getMessage(), e.getMessage());
-			return nova(cidade);
+			cityService.save(city);
+		} catch (NameCityAlreadyRegisteredException e) {
+			result.rejectValue("name", e.getMessage(), e.getMessage());
+			return newCity(city);
 		}
 		
-		attributes.addFlashAttribute("mensagem", "Cidade salva com sucesso!");
-		return new ModelAndView("redirect:/cidades/nova");
+		attributes.addFlashAttribute("message", "Cidade salva com sucesso!");
+		return new ModelAndView("redirect:/cities/new");
 	}
 	
 	@GetMapping
-	public ModelAndView pesquisar(CidadeFilter cidadeFilter, BindingResult result
+	public ModelAndView search(CityFilter filter, BindingResult result
 			, @PageableDefault(size = 10) Pageable pageable, HttpServletRequest httpServletRequest) {
-		ModelAndView mv = new ModelAndView("cidade/PesquisaCidades");
-		mv.addObject("estados", estados.findAll());
+		ModelAndView mv = new ModelAndView("city/search-cities");
+		mv.addObject("states", stateRepository.findAll());
 		
-		PageWrapper<Cidade> paginaWrapper = new PageWrapper<>(cidades.filtrar(cidadeFilter, pageable)
+		PageWrapper<City> pageWrapper = new PageWrapper<>(citiesQuery.filtered(filter, pageable)
 				, httpServletRequest);
-		mv.addObject("pagina", paginaWrapper);
+		mv.addObject("page", pageWrapper);
 		return mv;
 	}
 	

@@ -50,9 +50,9 @@ public class UserEmployee implements Serializable {
 	@Size(min = 1, message = "Select at least one group")
 	@ManyToMany
 	@JoinTable(name = "user_employee_group", joinColumns = @JoinColumn(name = "code_user_employee")
-				, inverseJoinColumns = @JoinColumn(name = "code_group"))
+				, inverseJoinColumns = @JoinColumn(name = "code_group_employee"))
 	@ToString.Exclude
-	private List<Group> groups;
+	private List<GroupEmployee> groupEmployees;
 
 	@Column(name = "birth_date")
 	private LocalDate birthDate;

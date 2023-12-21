@@ -1,80 +1,76 @@
-package com.algaworks.brewer.controller;
+package br.com.rafaelvieira.shopbeer.controller;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
-
-import org.springframework.beans.factory.annotation.Autowired;
+import br.com.rafaelvieira.shopbeer.controller.page.PageWrapper;
+import br.com.rafaelvieira.shopbeer.domain.Style;
+import br.com.rafaelvieira.shopbeer.repository.filter.StyleFilter;
+import br.com.rafaelvieira.shopbeer.repository.query.style.StylesQuery;
+import br.com.rafaelvieira.shopbeer.service.StyleService;
+import br.com.rafaelvieira.shopbeer.service.exception.NameStyleAlreadyRegisteredException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import com.algaworks.brewer.controller.page.PageWrapper;
-import com.algaworks.brewer.model.Estilo;
-import com.algaworks.brewer.repository.Estilos;
-import com.algaworks.brewer.repository.filter.EstiloFilter;
-import com.algaworks.brewer.service.CadastroEstiloService;
-import com.algaworks.brewer.service.exception.NomeEstiloJaCadastradoException;
+import java.util.Objects;
 
-@Controller
-@RequestMapping("/estilos")
+@RestController
+@RequestMapping("/styles")
 public class StyleController {
 
-	@Autowired
-	private CadastroEstiloService cadastroEstiloService;
-	
-	@Autowired
-	private Estilos estilos;
-	
-	@RequestMapping("/novo")
-	public ModelAndView novo(Estilo estilo) {
-		return new ModelAndView("estilo/CadastroEstilo");
+	private final StyleService styleService;
+	private final StylesQuery stylesQuery;
+
+    public StyleController(StyleService styleService, StylesQuery stylesQuery) {
+        this.styleService = styleService;
+        this.stylesQuery = stylesQuery;
+    }
+
+    @RequestMapping("/new")
+	public ModelAndView newStyle(Style style) {
+		return new ModelAndView("style/register-style");
 	}
 	
-	@RequestMapping(value = "/novo", method = RequestMethod.POST)
-	public ModelAndView cadastrar(@Valid Estilo estilo, BindingResult result, RedirectAttributes attributes) {
+	@PostMapping(value = "/new")
+	public ModelAndView register(@Valid Style style, BindingResult result, RedirectAttributes attributes) {
 		if (result.hasErrors()) {
-			return novo(estilo);
+			return newStyle(style);
 		}
 		
 		try {
-			cadastroEstiloService.salvar(estilo);
-		} catch (NomeEstiloJaCadastradoException e) {
-			result.rejectValue("nome", e.getMessage(), e.getMessage());
-			return novo(estilo);
+			styleService.save(style);
+		} catch (NameStyleAlreadyRegisteredException e) {
+			result.rejectValue("name", e.getMessage(), e.getMessage());
+			return newStyle(style);
 		}
 		
-		attributes.addFlashAttribute("mensagem", "Estilo salvo com sucesso");
-		return new ModelAndView("redirect:/estilos/novo");
+		attributes.addFlashAttribute("message", "Style saved successfully!");
+		return new ModelAndView("redirect:/styles/new");
 	}
 	
-	@RequestMapping(method = RequestMethod.POST, consumes = { MediaType.APPLICATION_JSON_VALUE })
-	public @ResponseBody ResponseEntity<?> salvar(@RequestBody @Valid Estilo estilo, BindingResult result) {
+	@PostMapping(consumes = { MediaType.APPLICATION_JSON_VALUE })
+	public ResponseEntity<?> save(@RequestBody @Valid Style style, BindingResult result) {
 		if (result.hasErrors()) {
-			return ResponseEntity.badRequest().body(result.getFieldError("nome").getDefaultMessage());
+			return ResponseEntity.badRequest().body(Objects.requireNonNull(result.getFieldError("name")).getDefaultMessage());
 		}
 		
-		estilo = cadastroEstiloService.salvar(estilo);
-		return ResponseEntity.ok(estilo);
+		style = styleService.save(style);
+		return ResponseEntity.ok(style);
 	}
 	
 	@GetMapping
-	public ModelAndView pesquisar(EstiloFilter estiloFilter, BindingResult result
+	public ModelAndView search(StyleFilter filter, BindingResult result
 			, @PageableDefault(size = 2) Pageable pageable, HttpServletRequest httpServletRequest) {
-		ModelAndView mv = new ModelAndView("estilo/PesquisaEstilos");
+		ModelAndView mv = new ModelAndView("style/search-styles");
 		
-		PageWrapper<Estilo> paginaWrapper = new PageWrapper<>(estilos.filtrar(estiloFilter, pageable)
+		PageWrapper<Style> pageWrapper = new PageWrapper<>(stylesQuery.filtered(filter, pageable)
 				, httpServletRequest);
-		mv.addObject("pagina", paginaWrapper);
+		mv.addObject("page", pageWrapper);
 		return mv;
 	}
 	

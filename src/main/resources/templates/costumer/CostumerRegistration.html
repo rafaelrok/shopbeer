@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:data="http://www.thymeleaf.org/extras/data"
+	  xmlns:shopbeer="http://shopbeer.rafaelvieira.com.br"
+	layout:decorate="~{layout/LayoutDefault}">
+
+<head>
+	<title>Cadastro de costumer</title>
+</head>
+
+<section layout:fragment="conteudo">
+
+	<div class="page-header">
+		<div class="container-fluid">
+			<div class="row">
+				<div class="col-sm-10">
+					<h1>Cadastro de costumer</h1>
+				</div>
+			
+				<div class="col-sm-2">
+					<div class="aw-page-header-controls">
+						<a class="btn  btn-default" th:href="@{/costumers}">
+							<i class="glyphicon  glyphicon-plus-sign"></i> <span class="hidden-xs  hidden-sm">Pesquisa</span>
+						</a>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="container-fluid">
+		<form method="POST" th:object="${costumer}" th:action="@{/costumers/new}">
+			<shopbeer:message/>
+			
+			<div class="row">
+				<div class="form-groupEmployee  col-sm-12  bw-required" shopbeer:classforerror="name">
+					<label for="name" class="control-label">Nome</label>
+					<input type="text" class="form-control" id="name" autofocus="autofocus" th:field="*{name}"/>
+				</div>
+			</div>
+			
+			<div class="row">
+				<div class="form-groupEmployee  col-sm-4  bw-required" shopbeer:classforerror="typePerson">
+					<label class="control-label">Tipo pessoa</label> 
+					<div>
+						<th:block th:each="typePerson : ${typesPerson}">
+							<div class="radio  radio-inline">
+								<input type="radio" th:id="|id_${typePerson}|" class="js-radio-type-person"
+									th:field="*{typePerson}" th:value="${typePerson}" 
+									data:document="${typePerson.document}" data:mask="${typePerson.mask}"> 
+								<label class="control-label" th:for="|id_${typePerson}|" th:text="${typePerson.description}">Física</label>
+							</div>
+						</th:block>
+					</div>
+				</div>
+				
+				<div class="form-groupEmployee  col-sm-8  bw-required" shopbeer:classforerror="cpfOuCnpj">
+					<label for="cpfOrCnpj" class="control-label">CPF/CNPJ</label>
+					<input type="text" class="form-control" id="cpfOrCnpj" th:field="*{cpfOrCnpj}" disabled/>
+				</div>
+			</div>
+			
+			<div class="row">
+				<div class="form-groupEmployee  col-sm-4">
+					<label for="telephone">Telefone</label>
+					<input type="text" class="form-control  js-phone-number" id="telephone" th:field="*{telephone}"/>
+				</div>
+				
+				<div class="form-groupEmployee  col-sm-8" shopbeer:classforerror="email">
+					<label for="email" class="control-label">E-mail</label>
+					<input type="text" class="form-control" id="email" th:field="*{email}"/>
+				</div>
+			</div>
+			
+			<div class="row">
+				<div class="form-groupEmployee  col-sm-4">
+					<label for="street">Logradouro</label>
+					<input type="text" class="form-control" id="street" th:field="*{address.street}"/>
+				</div>
+				
+				<div class="form-groupEmployee  col-sm-4">
+					<label for="number">Número</label>
+					<input type="text" class="form-control" id="number" th:field="*{address.number}"/>
+				</div>
+				
+				<div class="form-groupEmployee  col-sm-4">
+					<label for="complement">Complemento</label>
+					<input type="text" class="form-control" id="complement" th:field="*{address.complement}"/>
+				</div>
+			</div>
+			
+			<div class="row">
+				<div class="form-groupEmployee  col-sm-4">
+					<label for="zipCode">CEP</label>
+					<input type="text" class="form-control  js-zipcode" id="zipCode" th:field="*{address.zipCode}"/>
+				</div>
+				
+				<div class="form-groupEmployee  col-sm-4">
+					<label for="state">Estado</label>
+					<select id="state" class="form-control" th:field="*{address.state}">
+	                    <option value="">Selecione o estado</option>
+	                    <option th:each="estado : ${states}" th:value="${state.code}" th:text="${state.name}">São Paulo</option>
+	                </select>
+				</div>
+				
+				<div class="form-groupEmployee  col-sm-4">
+					<label  for="city">Cidade</label>
+					<div class="bw-field-action">
+						<input type="hidden" id="inputHiddenCitySelected" th:value="*{address.city} != null ? *{address.city.code}"/>
+						<select id="city" class="form-control" data:url="@{/cities}" th:field="*{address.city}">
+						</select>
+						
+						<div class="bw-field-action__icon  js-img-loading" style="display: none">
+							<img th:src="@{/images/mini-loading.gif}"/>
+						</div>
+					</div>
+				</div>
+			</div>
+			
+			<button type="submit" class="btn  btn-primary">Salvar</button>				
+		</form>
+	</div>
+</section>
+
+<th:block layout:fragment="javascript-extra">
+	<script th:src="@{/javascripts/costumer.mask-cpf-cnpj.js}"></script>
+	<script th:src="@{/javascripts/costumer.combo-state-city.js}"></script>
+</th:block>
+
+</html>
